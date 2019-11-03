@@ -1,0 +1,13 @@
+Description=Blog Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=ROOT/blog -conf ROOT/blog.toml
+Restart=on-failure
+RestartSec=3
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

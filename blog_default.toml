@@ -1,0 +1,52 @@
+[config]
+[blacklist]
+expiry = 600
+limit = 3
+
+[common]
+addr = ":8888"
+assets = "ROOT/assets"
+images = "/tmp/images"
+db_file = "/tmp/blog.db"
+[common.logging]
+roll_size = 10 # MB
+roll_interval = 720 # hour
+filename = "/tmp/blog.log"
+level = "info" # level greater or equal than
+panic_on_fatal = true # don't panic when log.Fatal is called
+
+[session]
+expiry = 3600 # second
+key = "serenity"
+auth_key = "elder"
+auth_val = "+1s"
+
+[model]
+title = "Serenity"
+tmpl_root = "ROOT/assets/templates"
+[model.edit]
+api = "/edit"
+tmpl = "edit.html"
+[model.login]
+api = "/login"
+tmpl = "login.html"
+[model.manage]
+main_api = "/manage"
+sub_api = "/manage/:sub"
+main= "manage.html"
+setting = "setting.html"
+[model.home]
+api = "/"
+tmpl = "home.html"
+[model.article]
+api = "/article"
+tmpl = "article.html"
+
+[service]
+assets = "/static/*files"
+image = "/image/*files"
+login = "/api/login"
+edit = "/api/edit"
+manage = "/api/manage"
+navi = "/api/navi"
+user = "/api/user"

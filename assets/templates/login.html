@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="/static/favicon.png">
+    <title>{{ .Title }}</title>
+    <style>
+        #c {
+            float: none;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 20%;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="row">
+        <div id="c" class="col-xs-6 col-md-4 col-center-block">
+            <label for="username">username:</label>
+            <input id="username" type="text" name="username" class="form-control" autocomplete="off"/>
+            <label for="password">password:</label>
+            <input id="password" type="password" name="password" class="form-control" autocomplete="off"/>
+            <br>
+            <button onclick="login();" class="btn btn-primary">Login</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myStatus"></h4>
+            </div>
+            <div class="modal-body" id="myModal"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+</body>
+<script src="/static/js/login.js"></script>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/home.css" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="/static/favicon.png">
+    <title>{{.Title}}</title>
+</head>
+　　
+<body>
+<script>
+    if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
+    {
+        document.body.classList.add('mobile');
+    }
+</script>
+
+<nav class="navbar navbar-default navbar-fixed-top" style="opacity: .9" role="navigation">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Home</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                {{range .Navis.Navis}}
+                    <li><a class="navbar-brand" href="//{{.Target}}">{{.Name}}</a></li>
+                {{end}}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="outer">
+    <ul class="list-group">
+        {{range .Posts }}
+            <li class="list-group-item title">
+                <div class="date">{{.Date | formatTime }}</div><br>
+                <a href="{{.Link}}">{{.Title}}</a>
+            </li>
+        {{end}}
+    </ul>
+</div>
+
+</body>
+</html>
