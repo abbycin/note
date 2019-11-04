@@ -44,9 +44,7 @@ func (c *article) Write(ctx *routers.Context) {
 		ctx.Resp.WriteHeader(http.StatusNotModified)
 		ctx.Resp.Write(nil)
 	} else {
-		ctx.Resp.WriteHeader(http.StatusOK)
-		h.Add("Content-Length", strconv.FormatInt(c.Size(), 10))
-		ctx.Resp.Write(c.text)
+		ctx.Html(http.StatusOK, c.text)
 	}
 }
 
@@ -128,7 +126,7 @@ func (a *Article) build(post *model.ArticleData, navi *model.NaviData) ([]byte, 
 }
 
 func (a *Article) Serve(c *routers.Context) {
-	id := c.Req.URL.Query().Get("id")
+	id := c.GetParam("id")
 	if id == "" {
 		c.Html(http.StatusNotFound, []byte("not found"))
 		return

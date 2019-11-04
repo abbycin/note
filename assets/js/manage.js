@@ -37,7 +37,7 @@ function logOut() {
 
 function toggleEye(id) {
     let hide = $(`#eye-${id}`).hasClass("glyphicon-eye-close");
-    fetch(`${Article}?id=${id}&hide=${!hide}`, {method: 'PUT'}).then(function(j) {
+    fetch(`${Article}/${id}?hide=${!hide}`, {method: 'PUT'}).then(function(j) {
         return j.json();
     }).then(function(res) {
         if(res.code !== 0) {
@@ -55,7 +55,7 @@ function toggleEye(id) {
 }
 
 function deleteArticle(o, id) {
-    fetch(`${Article}?id=${id}`, {method: 'DELETE'}).then(function(j) {
+    fetch(`${Article}/${id}`, {method: 'DELETE'}).then(function(j) {
         return j.json();
     }).then(function(res) {
         if(res.code !== 0) {
@@ -69,14 +69,14 @@ function deleteArticle(o, id) {
 }
 
 function editArticle(id) {
-    redirect(`${ModelEdit}?id=${id}`);
+    redirect(`${ModelEdit}/${id}`);
 }
 
 function buildTable(data) {
     $('#posts').empty(); // remove all children
     for(const post of data.posts) {
         let pid = `<td style="width: 5%">${post.id}</td>`;
-        let ptitle = `<td style="width: 20%"><a  target="_blank" href="${Thread}?id=${post.id}">${post.title}</a></td>`;
+        let ptitle = `<td style="width: 20%"><a  target="_blank" href="${Thread}/${post.id}">${post.title}</a></td>`;
         let ptime = `<td style="width: 20%">${post.create_time}<br>${post.last_modified}</td>`;
         let arr = [];
         for(const tag of post.tags) {

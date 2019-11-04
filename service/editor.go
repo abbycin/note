@@ -154,7 +154,7 @@ func (a *Editor) Del(c *routers.Context) {
 }
 
 func (a *Editor) Validate(c *routers.Context) (int, bool) {
-	id := c.Req.URL.Query().Get("id")
+	id := c.GetParam("id")
 
 	if id == "" {
 		c.Json(http.StatusBadRequest, newError(-1, "no id found"))

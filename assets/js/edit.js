@@ -47,10 +47,10 @@ function deleteArticle() {
         return redirect('manage');
     }
 
-    fetch(`${Edit}?id=${id}`, {method: 'DELETE'}).then(function(j) {
+    fetch(`${Edit}/${id}`, {method: 'DELETE'}).then(function(j) {
         return j.json();
     }).then(function(res) {
-        if(res.code != 0) {
+        if(res.code !== 0) {
             throw res.error;
         }
         redirect(Manage);
@@ -84,7 +84,7 @@ function publishArticle() {
     };
 
     let method = id === "" ? 'POST' : 'PUT';
-    fetch(`${Edit}?id=${id}`, {
+    fetch(`${Edit}/${id}`, {
         method: method,
         body: JSON.stringify(data),
         headers: {
@@ -93,7 +93,7 @@ function publishArticle() {
     }).then(function(j) {
         return j.json();
     }).then(function(res) {
-        if(res.code != 0) {
+        if(res.code !== 0) {
             throw res.error;
         }
 
@@ -118,7 +118,7 @@ function uploadImage() {
     fetch(`${Image}?filename=${img.name}`, {method: 'POST', body: formData}).then(function(j) {
         return j.json();
     }).then(function(res) {
-        if(res.code != 0) {
+        if(res.code !== 0) {
             throw res.error;
         }
 
@@ -154,22 +154,16 @@ $(document).ready(function() {
     $('#status_no').hide();
     $('#status_ok').hide();
 
-    let s = location.search.substring(1).split('&');
-    let q = {};
-    for(let i = 0; i < s.length; ++i) {
-        let t = s[i].split('=');
-        q[t[0]] = t[1];
-    }
+    let s = location.pathname.split('/');
+    let q = Number(s[s.length - 1]);
 
-    if(q['id'] !== undefined) {
-        id = q['id'];
-    }
-
-    if(id === "") {
+    if(Number.isNaN(q)) {
         return;
     }
 
-    fetch(`${Edit}?id=${id}`).then(function(j) {
+    id = '' + q;
+
+    fetch(`${Edit}/${id}`).then(function(j) {
         return j.json();
     }).then(function(data) {
         $('#title').val(data.title);

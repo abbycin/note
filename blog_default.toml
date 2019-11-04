@@ -25,7 +25,7 @@ auth_val = "+1s"
 title = "Serenity"
 tmpl_root = "ROOT/assets/templates"
 [model.edit]
-api = "/edit"
+api = "/edit/:id"
 tmpl = "edit.html"
 [model.login]
 api = "/login"
@@ -39,14 +39,14 @@ setting = "setting.html"
 api = "/"
 tmpl = "home.html"
 [model.article]
-api = "/article"
+api = "/article/:id"
 tmpl = "article.html"
 
 [service]
 assets = "/static/*files"
 image = "/image/*files"
 login = "/api/login"
-edit = "/api/edit"
+edit = "/api/edit/:id"
 manage = "/api/manage"
 navi = "/api/navi"
 user = "/api/user"

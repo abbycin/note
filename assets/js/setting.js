@@ -5,13 +5,12 @@ let User = "/api/user";
 let Logout = "/api/login";
 let hostname = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
 
-function showOk(msg, cb, arg) {
+function showOk(msg) {
     $('#myStatus').text('Status');
     $('#myModal').html(`<span style="color: green">${msg}</span>`);
     $('#modal').modal('show');
     setTimeout(function () {
         $('#modal').modal('hide');
-        cb(arg);
     }, 2000);
 }
 
@@ -117,7 +116,6 @@ function saveNavi(id) {
     }).then(function(j) {
         return j.json();
     }).then(function(res) {
-        console.log(res);
         if(res.code !== 0) {
             throw res.error;
         }

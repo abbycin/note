@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -55,6 +56,11 @@ func (h *home) Write(c *routers.Context) {
 	}
 }
 
+func (h *home) Makelink(p *model.Post) template.URL {
+	r := path.Join(h.h.article, fmt.Sprintf("%v", p.Id))
+	return template.URL(r)
+}
+
 func (h *home) Update() (interface{}, error) {
 	data, err := h.dao.GetPosts()
 	if err != nil {
@@ -72,7 +78,7 @@ func (h *home) Update() (interface{}, error) {
 		}
 		t := Post{
 			Date:  time.Time(p.CreateTime),
-			Link:  template.URL(fmt.Sprintf("%s?id=%d", h.h.cfg.Model.Article.Api, p.Id)),
+			Link:  h.Makelink(&p),
 			Title: p.Title,
 		}
 		res = append(res, t)
@@ -87,16 +93,18 @@ func (h *home) Update() (interface{}, error) {
 }
 
 type Home struct {
-	model model.Model
-	cfg   *conf.Config
-	cache *home
+	model   model.Model
+	cfg     *conf.Config
+	article string
+	cache   *home
 }
 
 func NewHome(cfg *conf.Config, dao *dbutil.Dao, r *routers.Router) *Home {
 	h := &Home{
-		model: model.NewDefaultModel(path.Join(cfg.Model.TmplRoot, cfg.Model.Home.Tmpl)),
-		cfg:   cfg,
-		cache: &home{dao: dao},
+		model:   model.NewDefaultModel(path.Join(cfg.Model.TmplRoot, cfg.Model.Home.Tmpl)),
+		cfg:     cfg,
+		article: cfg.Model.Article.Api[:strings.Index(cfg.Model.Article.Api, ":")],
+		cache:   &home{dao: dao},
 	}
 
 	h.cache.h = h

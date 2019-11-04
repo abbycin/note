@@ -20,14 +20,14 @@ import (
 type JSONTime time.Time
 
 func (t JSONTime) MarshalJSON() ([]byte, error) {
-	stamp := fmt.Sprintf(`"%s"`, time.Time(t).Format("2006 01-02 15:04:05"))
+	stamp := fmt.Sprintf(`"%s"`, time.Time(t).Format("2006-01-02 15:04:05"))
 	return []byte(stamp), nil
 }
 
 // no draft status, post can be viewed by authorized user even Hidden is true
 type Post struct {
 	Id           int      `json:"id"`
-	Title        string   `json:"title"` // a link to post, maybe /post?id=1
+	Title        string   `json:"title"`
 	Tags         []string `json:"tags"`
 	Hidden       bool     `json:"hide"`
 	CreateTime   JSONTime `json:"create_time"`
