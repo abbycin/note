@@ -24,16 +24,18 @@ type Router struct {
 	trie         map[string]*node
 	lru          *LRU
 	mgr          *session.SessionManager
+	proxyMode    bool
 	PanicHandler func(http.ResponseWriter, *http.Request, interface{})
 	NotFound     func(w http.ResponseWriter, r *http.Request)
 	callbacks    []IHandler
 }
 
-func New(mgr *session.SessionManager) *Router {
+func New(mgr *session.SessionManager, proxyMode bool) *Router {
 	return &Router{
 		trie:      make(map[string]*node),
 		lru:       NewLRU(100, 50<<20), // cache max 100 items total 50MB
 		mgr:       mgr,
+		proxyMode: proxyMode,
 		callbacks: make([]IHandler, 0),
 		NotFound:  http.NotFound,
 	}
@@ -56,7 +58,7 @@ func (r *Router) dispatch(w http.ResponseWriter, req *http.Request) {
 	if handlers == nil {
 		r.NotFound(w, req)
 	} else {
-		ctx := &Context{req, w, param, r.mgr, true}
+		ctx := &Context{req, w, param, r.mgr, true, r.proxyMode}
 		for _, cb := range r.callbacks {
 			cb.Serve(ctx)
 			if !ctx.next {

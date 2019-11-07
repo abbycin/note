@@ -98,7 +98,7 @@ func (a *Editor) Put(c *routers.Context) {
 			if err != nil {
 				c.Json(http.StatusBadRequest, newError(-1, err.Error()))
 			} else {
-				a.Update(c.Req.URL.Query().Get("id"))
+				a.Update(c.GetParam("id"))
 				c.Json(http.StatusOK, newError(0, ""))
 			}
 		}
@@ -117,7 +117,7 @@ func (a *Editor) Put(c *routers.Context) {
 	if err != nil {
 		c.Json(http.StatusBadRequest, newError(-2, err.Error()))
 	} else {
-		a.Update(c.Req.URL.Query().Get("id"))
+		a.Update(c.GetParam("id"))
 		c.Json(http.StatusOK, newError(0, ""))
 	}
 }

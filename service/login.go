@@ -14,7 +14,6 @@ import (
 	"blog/model"
 	"blog/routers"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 )
@@ -130,8 +129,9 @@ func (l *Login) Serve(c *routers.Context) {
 }
 
 func (l *Login) HandlePost(c *routers.Context) {
-	remoteIp := strings.Split(c.Req.RemoteAddr, ":")[0]
+	remoteIp := c.RemoteAddr()
 	if !l.bl.valid(remoteIp) {
+		logging.Warn("too many attempts: %s", remoteIp)
 		c.Json(http.StatusBadRequest, newError(-1, "fuck you!"))
 		return
 	}

@@ -31,11 +31,12 @@ type Blacklist struct {
 }
 
 type Common struct {
-	Addr    string  `toml:"addr"`
-	Assets  string  `toml:"assets"`
-	Images  string  `toml:"images"`
-	DbFile  string  `toml:"db_file"`
-	Logging Logging `toml:"logging"`
+	Addr      string  `toml:"addr"`
+	Assets    string  `toml:"assets"`
+	Images    string  `toml:"images"`
+	DbFile    string  `toml:"db_file"`
+	Logging   Logging `toml:"logging"`
+	ProxyMode bool    `toml:"proxy_mode"`
 }
 
 type Logging struct {

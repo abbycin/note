@@ -8,6 +8,8 @@ addr = ":8888"
 assets = "ROOT/assets"
 images = "/tmp/images"
 db_file = "/tmp/blog.db"
+# affect remote addr
+proxy_mode = true
 [common.logging]
 roll_size = 10 # MB
 roll_interval = 720 # hour

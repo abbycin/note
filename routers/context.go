@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -23,11 +24,12 @@ const (
 )
 
 type Context struct {
-	Req   *http.Request
-	Resp  http.ResponseWriter
-	param *paramImpl
-	mgr   *session.SessionManager
-	next  bool
+	Req       *http.Request
+	Resp      http.ResponseWriter
+	param     *paramImpl
+	mgr       *session.SessionManager
+	next      bool
+	proxyMode bool
 }
 
 func (c *Context) simpleResponse(mime string, code int, data []byte) {
@@ -85,4 +87,12 @@ func (c *Context) Next() {
 
 func (c *Context) Abort() {
 	c.next = false
+}
+
+func (c *Context) RemoteAddr() string {
+	if c.proxyMode {
+		return c.Req.Header.Get("X-Real-IP")
+	} else {
+		return strings.Split(c.Req.RemoteAddr, ":")[0]
+	}
 }

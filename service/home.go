@@ -127,7 +127,7 @@ func (h *Home) Serve(c *routers.Context) {
 }
 
 func (h *Home) formatTime(arg interface{}) string {
-	return arg.(time.Time).Format("2006 01-02 15:04:05")
+	return arg.(time.Time).Format("2006-01-02 15:04:05")
 }
 
 func (h *Home) Update(arg interface{}) {

@@ -53,7 +53,7 @@ func main() {
 
 	access := middleware.NewAccess()
 
-	r := routers.New(mgr)
+	r := routers.New(mgr, cfg.Common.ProxyMode)
 	r.ServeFile(cfg.Service.Assets, cfg.Common.Assets)
 	r.AddCb(access)
 

@@ -188,7 +188,7 @@ func (m *SessionManager) newSession(w http.ResponseWriter, r *http.Request) (ISe
 	sid := buildId()
 	session, e := m.backend.Init(sid)
 	if e != nil {
-		logging.Info("SessionManager::newSession: %s for: %s", e.Error(), r.RemoteAddr)
+		logging.Info("SessionManager::newSession: %s", e.Error())
 	}
 	cookie := http.Cookie{Name: m.name, Value: url.QueryEscape(sid), Path: "/", HttpOnly: true, MaxAge: int(m.maxAge)}
 	http.SetCookie(w, &cookie)
@@ -206,11 +206,11 @@ func (m *SessionManager) StartSession(w http.ResponseWriter, r *http.Request) (s
 	} else {
 		sid, e := url.QueryUnescape(cookie.Value)
 		if e != nil {
-			logging.Error("unescape cookie: %s, for: %s", e.Error(), r.RemoteAddr)
+			logging.Error("unescape cookie: %s", e.Error())
 		}
 		session, e = m.backend.Get(sid)
 		if e != nil {
-			logging.Info("session id is not exists(maybe a previous seesion), create a new one for: %s", r.RemoteAddr)
+			logging.Info("session id is not exists(maybe a previous session), create a new one")
 			session, _ = m.newSession(w, r)
 		}
 	}

@@ -20,5 +20,5 @@ func NewAccess() *Access {
 }
 
 func (a *Access) Serve(c *routers.Context) {
-	logging.Info("ACCESS: %s %s %s", c.Req.RemoteAddr, c.Req.Method, c.Req.URL.String())
+	logging.Info("ACCESS: %s %s %s", c.RemoteAddr(), c.Req.Method, c.Req.URL.String())
 }
