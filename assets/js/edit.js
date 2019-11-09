@@ -84,7 +84,8 @@ function publishArticle() {
     };
 
     let method = id === "" ? 'POST' : 'PUT';
-    fetch(`${Edit}/${id}`, {
+    let rid = id === "" ? '0' : id;
+    fetch(`${Edit}/${rid}`, {
         method: method,
         body: JSON.stringify(data),
         headers: {
@@ -155,13 +156,16 @@ $(document).ready(function() {
     $('#status_ok').hide();
 
     let s = location.pathname.split('/');
-    let q = Number(s[s.length - 1]);
-
-    if(Number.isNaN(q)) {
+    let q = s[s.length - 1];
+    if(q.length === 0) {
+        return;
+    }
+    let nq = Number(q);
+    if(Number.isNaN(nq) || nq === 0) {
         return;
     }
 
-    id = '' + q;
+    id = '' + nq;
 
     fetch(`${Edit}/${id}`).then(function(j) {
         return j.json();

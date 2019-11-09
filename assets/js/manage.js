@@ -11,7 +11,7 @@ function redirect(dst) {
 }
 
 function newPost() {
-    redirect(ModelEdit);
+    redirect(`${ModelEdit}/0`);
 }
 
 function toHome() {
