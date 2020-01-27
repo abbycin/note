@@ -16,6 +16,14 @@ let editor = new EasyMDE({
     }
 });
 
+editor.codemirror.on("update", function(){
+    if(editor.isSideBySideActive() || editor.isFullscreenActive()) {
+        $('#navi').hide();
+    } else {
+        $('#navi').show();
+    }
+});
+
 function showOk(msg, cb, arg) {
     $('#myStatus').text('Status');
     $('#myModal').html(`<span style="color: green">${msg}</span>`);

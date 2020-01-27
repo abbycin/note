@@ -5,6 +5,11 @@
     <script src="https://cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML">
+        MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['\\(','\\)']]}
+        });
+    </script>
     <link rel="stylesheet" href="/static/css/highlightjs/styles/tomorrow.css">
     <script src="/static/js/highlight.pack.js"></script>
     <link rel="stylesheet" href="/static/css/easymde/easymde.min.css">
@@ -36,39 +41,48 @@
 </head>
 
 <body>
-<div class="container" style="width: 90%; margin-top: 2%;">
+<nav id='navi' class="navbar navbar-default navbar-fixed-top" style="opacity: .9" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Home</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="navbar-brand" href="javascript:toggleTag();">
+                        <span class="glyphicon glyphicon-tags"></span> Edit Tags
+                    </a>
+                </li>
+                <li>
+                    <a class="navbar-brand" href="javascript:toggleImage();">
+                        <span class="glyphicon glyphicon-picture"></span> Upload Image
+                    </a>
+                </li>
+                <li>
+                    <a class="navbar-brand" href="javascript:publishArticle();">
+                        <span class="glyphicon  glyphicon-floppy-save"></span> Publish
+                    </a>
+                </li>
+                <li>
+                    <a class="navbar-brand" href="javascript:back2Manage();">
+                        <span class="glyphicon  glyphicon-arrow-left"></span> Manage
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="width: 90%; margin-top: 5%;">
     <div class="row-fluid">
         <div id="main" class="panel col-md-8 col-md-offset-2">
-            <div class="panel-heading" style="text-align: center">
-                <div class="dropdown" style="margin-left: 90%">
-                    <span class="glyphicon glyphicon-cog dropdown-toggle" data-toggle="dropdown"></span>
-                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu1">
-                        <li role="presentation">
-                            <a role="menuitem" href="javascript:toggleTag();">
-                                <span class="glyphicon glyphicon-tags"></span> Edit Tags
-                            </a>
-                        </li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation">
-                            <a role="menuitem" href="javascript:toggleImage();">
-                                <span class="glyphicon glyphicon-picture"></span> Upload Image
-                            </a>
-                        </li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation">
-                            <a role="menuitem" href="javascript:publishArticle();">
-                                <span class="glyphicon  glyphicon-floppy-save"></span> Publish
-                            </a>
-                        </li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation">
-                            <a role="menuitem" href="javascript:back2Manage();">
-                                <span class="glyphicon  glyphicon-arrow-left"></span> Manage
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
             <div class="panel-body">
                 <div class="input-group" style="margin-left: 10%; margin-right: 10%">
                     <span class="input-group-addon">Title</span>
