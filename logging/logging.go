@@ -74,7 +74,16 @@ func Init(cfg *Logger) error {
 	backend.idx = 0
 
 	prefix := fmt.Sprintf("%s-%s", backend.FileName, time.Now().Format("20060102"))
-	entries, err := ioutil.ReadDir(backend.dir)
+	abs, err := filepath.Abs(backend.dir)
+	if err != nil {
+		return err;
+	}
+
+	if _, err := os.Stat(abs); os.IsNotExist(err) {
+		os.Mkdir(abs, 0755)
+	}
+
+	entries, err := ioutil.ReadDir(abs)
 	if err != nil {
 		return err
 	}
@@ -99,6 +108,7 @@ func Init(cfg *Logger) error {
 	}
 
 	backend.file, err = os.Create(backend.genName())
+
 	return err
 }
 
