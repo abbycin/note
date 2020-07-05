@@ -58,19 +58,14 @@ func (r *Router) dispatch(w http.ResponseWriter, req *http.Request) {
 	if handlers == nil {
 		r.NotFound(w, req)
 	} else {
-		ctx := &Context{req, w, param, r.mgr, true, r.proxyMode}
+		ctx := newContext(r, param, handlers, req, w)
 		for _, cb := range r.callbacks {
 			cb.Serve(ctx)
-			if !ctx.next {
+			if ctx.abort {
 				break
 			}
 		}
-		for _, h := range handlers {
-			h.Serve(ctx)
-			if !ctx.next {
-				break
-			}
-		}
+		ctx.Next()
 	}
 }
 

@@ -23,13 +23,40 @@ const (
 	tHtml = "plain/html"
 )
 
+type HandlerMap struct {
+	handler IHandler
+	called  bool
+}
+
 type Context struct {
 	Req       *http.Request
 	Resp      http.ResponseWriter
 	param     *paramImpl
 	mgr       *session.SessionManager
-	next      bool
+	abort     bool
 	proxyMode bool
+	handlers  []HandlerMap
+}
+
+func newContext(r *Router, param *paramImpl, handlers []IHandler, req *http.Request, resp http.ResponseWriter) *Context {
+	ctx := &Context{
+		Req:       req,
+		Resp:      resp,
+		param:     param,
+		mgr:       r.mgr,
+		abort:     false,
+		proxyMode: r.proxyMode,
+		handlers:  make([]HandlerMap, 0),
+	}
+
+	for _, h := range handlers {
+		ctx.handlers = append(ctx.handlers, HandlerMap{
+			handler: h,
+			called:  false,
+		})
+	}
+
+	return ctx
 }
 
 func (c *Context) simpleResponse(mime string, code int, data []byte) {
@@ -82,11 +109,20 @@ func (c *Context) Unmarshal(out interface{}) error {
 }
 
 func (c *Context) Next() {
-	c.next = true
+	for _, h := range c.handlers {
+		if c.abort {
+			break
+		}
+		if h.called {
+			continue
+		}
+		h.called = true
+		h.handler.Serve(c)
+	}
 }
 
 func (c *Context) Abort() {
-	c.next = false
+	c.abort = true
 }
 
 func (c *Context) RemoteAddr() string {
