@@ -56,7 +56,7 @@ type ISessionBackend interface {
 type SessionManager struct {
 	mtx     sync.Mutex
 	name    string
-	maxAge  time.Duration
+	maxAge  int
 	backend ISessionBackend
 }
 
@@ -179,7 +179,7 @@ func NewSessionManager(cfg *conf.Config) *SessionManager {
 	return &SessionManager{
 		mtx:     sync.Mutex{},
 		name:    cfg.Session.Key,
-		maxAge:  time.Duration(cfg.Session.Expiry * int(time.Second)),
+		maxAge:  cfg.Session.Expiry,
 		backend: NewDefaultBackend(),
 	}
 }
@@ -190,7 +190,7 @@ func (m *SessionManager) newSession(w http.ResponseWriter, r *http.Request) (ISe
 	if e != nil {
 		logging.Info("SessionManager::newSession: %s", e.Error())
 	}
-	cookie := http.Cookie{Name: m.name, Value: url.QueryEscape(sid), Path: "/", HttpOnly: true, MaxAge: int(m.maxAge)}
+	cookie := http.Cookie{Name: m.name, Value: url.QueryEscape(sid), Path: "/", HttpOnly: true, MaxAge: m.maxAge}
 	http.SetCookie(w, &cookie)
 	return session, e
 }
@@ -242,6 +242,6 @@ func (m *SessionManager) StartGC() {
 func (m *SessionManager) GC() {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
-	m.backend.Clean(m.maxAge)
-	time.AfterFunc(m.maxAge, func() { m.GC() })
+	m.backend.Clean(time.Second * time.Duration(m.maxAge))
+	time.AfterFunc(time.Second*time.Duration(m.maxAge), func() { m.GC() })
 }
