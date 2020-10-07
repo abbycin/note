@@ -27,25 +27,35 @@ import (
 var (
 	help    bool
 	cfgPath string
+	ver     bool
+
+	GitVersion string
+	Built      string
+	Prefix     string
 )
 
 func init() {
 	flag.BoolVar(&help, "h", false, "show help")
 	flag.StringVar(&cfgPath, "conf", "", "config file path")
+	flag.BoolVar(&ver, "v", false, "show version")
 }
 
 func main() {
 	flag.Parse()
+
+	if ver {
+		fmt.Println("built:  ", Built)
+		fmt.Println("git:    ", GitVersion)
+		os.Exit(0)
+	}
+
 	if help || cfgPath == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
 
 	cfg := conf.Init(cfgPath)
-	if err := logging.Init(cfg.GetLogger()); err != nil {
-		fmt.Printf("can't init logger: %s\n", err)
-		os.Exit(1)
-	}
+	logging.Init(cfg.GetLogger(), len(Prefix))
 	defer logging.Release()
 
 	mgr := session.NewSessionManager(cfg)

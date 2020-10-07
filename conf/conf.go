@@ -40,11 +40,11 @@ type Common struct {
 }
 
 type Logging struct {
+	Stderr       bool          `toml:"stderr"`
 	FileName     string        `toml:"filename"`
 	RollSize     int64         `toml:"roll_size"`
 	RollInterval time.Duration `toml:"roll_interval"`
 	Level        string        `toml:"level"`
-	PanicOnFatal bool          `toml:"panic_on_fatal"`
 }
 
 type Session struct {
@@ -104,13 +104,12 @@ func (c *Config) str2Level() int {
 	}
 }
 
-func (c *Config) GetLogger() *logging.Logger {
-	return &logging.Logger{
-		RollSize:     c.Common.Logging.RollSize * (1 << 20),
-		RollInterval: c.Common.Logging.RollInterval * time.Hour,
+func (c *Config) GetLogger() logging.Config {
+	return logging.Config{
+		RollSize:     c.Common.Logging.RollSize,
+		RollInterval: c.Common.Logging.RollInterval,
 		FileName:     c.Common.Logging.FileName,
 		Level:        c.str2Level(),
-		PanicOnFatal: c.Common.Logging.PanicOnFatal,
 	}
 }
 
