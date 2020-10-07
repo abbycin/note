@@ -132,7 +132,7 @@ func Init(cfg Config, offset int) {
 		return fmt.Sprintf("%s/%s-%s-%d.log", backend.dir, backend.cfg.FileName, cur, backend.idx)
 	}
 
-	backend.file, err = os.OpenFile(backend.genName(), os.O_APPEND|os.O_WRONLY, 0644)
+	backend.file, err = os.OpenFile(backend.genName(), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	panicIf(err, "create log file")
 }
 
