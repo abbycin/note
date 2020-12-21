@@ -42,7 +42,7 @@ func NewImage(cfg *conf.Config, r *routers.Router, middleware ...routers.IHandle
 	}
 
 	r.POST(i.api, append(middleware, i)...)
-	r.ServeFile(i.api, cfg.Common.Images)
+	r.ServeFile(i.api, cfg.Common.Images, cfg.Mimes)
 	return i
 }
 

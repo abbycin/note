@@ -18,11 +18,12 @@ import (
 )
 
 type Config struct {
-	Blacklist Blacklist `toml:"blacklist"`
-	Common    Common    `toml:"common"`
-	Session   Session   `toml:"session"`
-	Model     Model     `toml:"model"`
-	Service   Service   `tmol:"service"`
+	Blacklist Blacklist         `toml:"blacklist"`
+	Common    Common            `toml:"common"`
+	Session   Session           `toml:"session"`
+	Model     Model             `toml:"model"`
+	Service   Service           `tmol:"service"`
+	Mimes     map[string]string `toml:"mimes"`
 }
 
 type Blacklist struct {
@@ -128,5 +129,10 @@ func Init(cfgPath string) *Config {
 	if err != nil {
 		log.Panicf("can't decode configuration file: %s\n", err)
 	}
+	tmp := make(map[string]string)
+	for k, v := range res.Mimes {
+		tmp[strings.ToLower(k)] = strings.ToLower(v)
+	}
+	res.Mimes = tmp
 	return res
 }

@@ -64,7 +64,7 @@ func main() {
 	access := middleware.NewAccess()
 
 	r := routers.New(mgr, cfg.Common.ProxyMode)
-	r.ServeFile(cfg.Service.Assets, cfg.Common.Assets)
+	r.ServeFile(cfg.Service.Assets, cfg.Common.Assets, cfg.Mimes)
 	r.AddCb(access)
 
 	dao := dbutil.NewDao(cfg.Common.DbFile)

@@ -28,6 +28,7 @@ type statics struct {
 	mime  string
 	data  []byte
 	limit int64 // pre-item size limit, if size exceed limit, it will not be cached
+	mimes map[string]string
 	lru   *LRU
 	os.FileInfo
 }
@@ -57,8 +58,16 @@ func (s *statics) Update(args ...interface{}) (interface{}, error) {
 		return false, errors.New("can't be directory")
 	}
 	//s.mime = http.DetectContentType(s.data)
-	ext := filepath.Ext(s.Name())
-	s.mime = mime.TypeByExtension(ext)
+	ext := strings.ToLower(filepath.Ext(s.Name()))
+	s.mime = ""
+	if len(ext) > 0 {
+		ok := true
+		s.mime, ok = s.mimes[ext[1:]]
+		if !ok {
+			s.mime = mime.TypeByExtension(ext)
+		}
+	}
+
 	if s.mime == "" {
 		s.mime = "application/octet-stream"
 	}
@@ -105,7 +114,7 @@ func (s *statics) Serve(c *Context) {
 
 	data := s.lru.Get(path)
 	if data == nil {
-		data = newStatic(nil, s.key, path, s.limit)
+		data = newStatic(nil, s.key, path, s.limit, s.mimes)
 		_, err := data.Update()
 		if err != nil {
 			// write log
@@ -129,7 +138,7 @@ func (s *statics) Serve(c *Context) {
 	data.Write(c)
 }
 
-func newStatic(lru *LRU, path, local string, limit int64) *statics {
+func newStatic(lru *LRU, path, local string, limit int64, mimes map[string]string) *statics {
 	if strings.Index(path, ":") >= 0 {
 		panic("placeholder ':' is not allowed for serving static files, " + path)
 	}
@@ -159,6 +168,7 @@ func newStatic(lru *LRU, path, local string, limit int64) *statics {
 		path:  local,
 		lru:   lru,
 		limit: limit,
+		mimes: mimes,
 	}
 	return r
 }
