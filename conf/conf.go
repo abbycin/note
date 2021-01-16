@@ -18,11 +18,12 @@ import (
 )
 
 type Config struct {
-	Blacklist Blacklist `toml:"blacklist"`
-	Common    Common    `toml:"common"`
-	Session   Session   `toml:"session"`
-	Model     Model     `toml:"model"`
-	Service   Service   `tmol:"service"`
+	Blacklist Blacklist         `toml:"blacklist"`
+	Common    Common            `toml:"common"`
+	Session   Session           `toml:"session"`
+	Model     Model             `toml:"model"`
+	Service   Service           `tmol:"service"`
+	Mimes     map[string]string `toml:"mimes"`
 }
 
 type Blacklist struct {
@@ -40,11 +41,11 @@ type Common struct {
 }
 
 type Logging struct {
+	Stderr       bool          `toml:"stderr"`
 	FileName     string        `toml:"filename"`
 	RollSize     int64         `toml:"roll_size"`
 	RollInterval time.Duration `toml:"roll_interval"`
 	Level        string        `toml:"level"`
-	PanicOnFatal bool          `toml:"panic_on_fatal"`
 }
 
 type Session struct {
@@ -104,13 +105,12 @@ func (c *Config) str2Level() int {
 	}
 }
 
-func (c *Config) GetLogger() *logging.Logger {
-	return &logging.Logger{
-		RollSize:     c.Common.Logging.RollSize * (1 << 20),
-		RollInterval: c.Common.Logging.RollInterval * time.Hour,
+func (c *Config) GetLogger() logging.Config {
+	return logging.Config{
+		RollSize:     c.Common.Logging.RollSize,
+		RollInterval: c.Common.Logging.RollInterval,
 		FileName:     c.Common.Logging.FileName,
 		Level:        c.str2Level(),
-		PanicOnFatal: c.Common.Logging.PanicOnFatal,
 	}
 }
 
@@ -129,5 +129,10 @@ func Init(cfgPath string) *Config {
 	if err != nil {
 		log.Panicf("can't decode configuration file: %s\n", err)
 	}
+	tmp := make(map[string]string)
+	for k, v := range res.Mimes {
+		tmp[strings.ToLower(k)] = strings.ToLower(v)
+	}
+	res.Mimes = tmp
 	return res
 }

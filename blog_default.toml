@@ -52,3 +52,13 @@ edit = "/api/edit/:id"
 manage = "/api/manage"
 navi = "/api/navi"
 user = "/api/user"
+
+[mimes]
+# user defined mime, using the "mime" package if this is not present
+# key is case insensitive
+"c" = "text/plain"
+"cc" = "text/plain"
+"cpp" = "text/plain"
+"h" = "text/plain"
+"asm" = "text/plain"
+"s" = "text/plain"

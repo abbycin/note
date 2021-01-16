@@ -28,13 +28,27 @@ const (
 	FATAL = 4
 )
 
-type Logger struct {
-	FileName     string        `json:"filename" toml:"filename"`
-	RollSize     int64         `json:"roll_size" toml:"roll_size"`
-	RollInterval time.Duration `json:"roll_interval" toml:"roll_interval"`
-	Level        int           `json:"level" toml:"level"`
-	PanicOnFatal bool          `json:"panic_on_fatal" toml:"panic_on_fatal"`
+type Config struct {
+	Stderr       bool          `toml:"stdout"`
+	FileName     string        `toml:"filename"`
+	RollSize     int64         `toml:"roll_size"`
+	RollInterval time.Duration `toml:"roll_interval"`
+	Level        int           `toml:"level"`
+}
 
+func normalize(cfg Config) Config {
+	return Config{
+		Stderr:       cfg.Stderr,
+		FileName:     path.Base(strings.TrimSuffix(cfg.FileName, filepath.Ext(cfg.FileName))),
+		RollSize:     cfg.RollSize * (1 << 20),
+		RollInterval: cfg.RollInterval * time.Hour,
+		Level:        cfg.Level,
+	}
+}
+
+type Ef struct {
+	offset      int
+	cfg         Config
 	genName     func() string
 	format      func(int, string, int) string
 	dir         string
@@ -45,46 +59,59 @@ type Logger struct {
 	timePoint   time.Time
 	file        *os.File
 	mtx         sync.Mutex
+	pid         int
 }
 
-var backend = Logger{}
+var backend = Ef{}
+
+func panicIf(err error, s string) {
+	if err != nil {
+		panic(fmt.Sprintf("%v: %v", s, err))
+	}
+}
 
 func init() {
+	backend.offset = 0
 	backend.roll = false
-	backend.PanicOnFatal = true
+	backend.pid = os.Getpid()
 	backend.level = [5]string{"DEBUG", "INFO ", "WARN ", "ERROR", "FATAL"}
-	backend.format = func(level int, file string, line int) string {
+	backend.format = func(level int, path string, line int) string {
 		// fuck golang
-		return fmt.Sprintf("[%s %s] %s:%d ", time.Now().Format("2006-01-02 15:04:05.000"), backend.level[level], file, line)
+		return fmt.Sprintf("[%s %s]<%d> %s:%d ", time.Now().Format("2006-01-02 15:04:05.000"),
+			backend.level[level], backend.pid, path[backend.offset:], line)
 	}
-	backend.file = os.Stdout
+	backend.file = os.Stderr
 }
 
-func Init(cfg *Logger) error {
-	backend.roll = true
-	backend.RollSize = cfg.RollSize
-	backend.RollInterval = cfg.RollInterval
-	backend.Level = cfg.Level
-	backend.PanicOnFatal = cfg.PanicOnFatal
+func Init(cfg Config, offset int) {
+	if cfg.Stderr {
+		return
+	}
+	var err error
+	backend.offset = offset
 
+	backend.cfg = normalize(cfg)
+	backend.roll = true
 	backend.dir = path.Dir(cfg.FileName)
-	backend.FileName = path.Base(strings.TrimSuffix(cfg.FileName, filepath.Ext(cfg.FileName)))
 	backend.sizeCounter = 0
 	backend.timePoint = time.Now()
-	backend.idx = 0
+	backend.idx = 1
 
-	prefix := fmt.Sprintf("%s-%s", backend.FileName, time.Now().Format("20060102"))
+	_ = os.Mkdir(backend.dir, os.ModePerm)
+	prefix := fmt.Sprintf("%s-%s", backend.cfg.FileName, time.Now().Format("20060102"))
 	entries, err := ioutil.ReadDir(backend.dir)
-	if err != nil {
-		return err
-	}
+	panicIf(err, "read log dir")
 
 	// /path/to/prefix-20190617-pid-1.log
 	for _, e := range entries {
 		if strings.HasPrefix(e.Name(), prefix) {
-			tmp, err := strconv.Atoi(strings.Split(strings.TrimSuffix(e.Name(), filepath.Ext(e.Name())), "-")[3])
+			sp := strings.Split(strings.TrimSuffix(e.Name(), filepath.Ext(e.Name())), "-")
+			if len(sp) < 4 {
+				continue
+			}
+			tmp, err := strconv.Atoi(sp[3])
 			if err != nil {
-				return err
+				continue
 			}
 			if backend.idx < tmp {
 				backend.idx = tmp
@@ -94,21 +121,28 @@ func Init(cfg *Logger) error {
 
 	backend.genName = func() string {
 		cur := time.Now().Format("20060102")
-		backend.idx += 1
-		return fmt.Sprintf("%s/%s-%s-%d-%d.log", backend.dir, backend.FileName, cur, os.Getpid(), backend.idx)
+		f := fmt.Sprintf("%s/%s-%s-%d.log", backend.dir, backend.cfg.FileName, cur, backend.idx)
+		info, err := os.Stat(f)
+		if os.IsNotExist(err) {
+			return f
+		}
+		if info.Size() > backend.cfg.RollSize {
+			backend.idx += 1
+		}
+		return fmt.Sprintf("%s/%s-%s-%d.log", backend.dir, backend.cfg.FileName, cur, backend.idx)
 	}
 
-	backend.file, err = os.Create(backend.genName())
-	return err
+	backend.file, err = os.OpenFile(backend.genName(), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	panicIf(err, "create log file")
 }
 
-func (b *Logger) dispatch(level int, f string, args ...interface{}) {
+func (b *Ef) dispatch(level int, f string, args ...interface{}) {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
-	if level < b.Level {
+	if level < b.cfg.Level {
 		return
 	}
-	if b.roll && (b.sizeCounter > b.RollSize || time.Since(b.timePoint) > b.RollInterval) {
+	if b.roll && (b.sizeCounter > b.cfg.RollSize || time.Since(b.timePoint) > b.cfg.RollInterval) {
 		b.sizeCounter = 0
 		b.timePoint = time.Now()
 		Release()
@@ -116,7 +150,7 @@ func (b *Logger) dispatch(level int, f string, args ...interface{}) {
 	}
 
 	_, file, line, _ := runtime.Caller(2) // golang is horrible
-	data := []byte(b.format(level, path.Base(file), line) + fmt.Sprintf(f, args...))
+	data := []byte(b.format(level, file, line) + fmt.Sprintf(f, args...))
 	n, err := b.file.Write(append(data, '\n'))
 	if err != nil {
 		panic(err)
@@ -151,7 +185,5 @@ func Error(f string, args ...interface{}) {
 
 func Fatal(f string, args ...interface{}) {
 	backend.dispatch(FATAL, f, args...)
-	if backend.PanicOnFatal {
-		panic("fatal error")
-	}
+	panic("fatal error:" + fmt.Sprintf(f, args...))
 }

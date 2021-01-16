@@ -88,8 +88,8 @@ func (r *Router) catcher(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (r *Router) ServeFile(path, local string) {
-	r.AddRoute(http.MethodGet, path, newStatic(r.lru, path, local, 3<<20))
+func (r *Router) ServeFile(path, local string, mimes map[string]string) {
+	r.AddRoute(http.MethodGet, path, newStatic(r.lru, path, local, 3<<20, mimes))
 }
 
 func (r *Router) GET(path string, handler ...IHandler) {
