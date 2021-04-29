@@ -110,7 +110,7 @@ a:not(.navi) {
     text-decoration: none;
     cursor: crosshair;
     border-bottom: 1px dashed orange;
-    color: #930ee4;
+    color: #53aae0;
 }
 
 
@@ -120,15 +120,18 @@ a:hover:not(.navi) {
 
 
 img {
-    width: 80%;
+/*    width: 80%; */
+    /* fit to div */
+    max-height: 100%;
+    max-width: 100%;
     display: block;
-    box-shadow: 0 0 2px #555;
+    box-shadow: 0 0 10px #555;
     border-radius: 6px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 10px;
     margin-bottom: 10px;
-    -webkit-box-shadow: 0 0 2px #555;
+    -webkit-box-shadow: 0 0 10px #555;
 }
 
 img.displayed {
@@ -164,6 +167,32 @@ body.mobile div.inner {
     padding: 2% 4% 4% 4%;
 }
 
+.left {
+    float: left;
+    clear: both;
+    width: 50%;
+    padding: 25 24 25 0;
+    border-top: 1px solid lightblue;
+}
+
+.right {
+    float: left;
+    clear: none;
+    width: 50%;
+    padding: 25 0 25 24;
+    border-top: 1px solid lightblue;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.row {
+    clear: both;
+}
+
 .navbar-default {
     background-image: none;
     background-color: #fff;
@@ -181,14 +210,14 @@ body.mobile div.inner {
 }
 
 table {
-    border-collapse: collapse;
-    width: 100%;
+	border-collapse: collapse;
+	width: 100%;
 }
 
 th, td {
-    border-top: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    padding: 0.6rem;
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	padding: 0.6rem;
 }
