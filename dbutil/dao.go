@@ -40,7 +40,8 @@ func NewDao(dbFile string) *Dao {
     	content text,
     	tags text,
     	images text,
-    	hide boolean
+    	hide boolean,
+    	view_count integer default 0
     	)`)
 
 	if err != nil {
@@ -90,12 +91,11 @@ func (d *Dao) GetArticle(id int64, includeHide bool) (*model.ArticleData, error)
 	for res.Next() {
 		count += 1
 		err = res.Scan(&data.Id, &data.CreateTime, &data.LastModified,
-			&data.Title, &data.Content, &data.Tags, &data.Images, &data.Hide)
+			&data.Title, &data.Content, &data.Tags, &data.Images, &data.Hide, &data.ViewCount)
 
 		if err != nil {
 			return nil, err
 		}
-
 	}
 
 	if count == 0 {
@@ -125,9 +125,47 @@ func (d *Dao) UpdateArticle(id int, data *model.ArticleData) error {
 	return err
 }
 
+func (d *Dao) IncrViewCount(id int) (error, *int) {
+	stmt, err := d.db.Prepare(`update posts set view_count = view_count + 1 where id = ?`)
+	if err != nil {
+		logging.Error("%s", err)
+		return err, nil
+	}
+
+	tx, err := d.db.Begin()
+	if err != nil {
+		logging.Error("%s", err)
+		return err, nil
+	}
+
+	_, err = tx.Stmt(stmt).Exec(id)
+	if err != nil {
+		logging.Error("%s", err)
+		tx.Rollback()
+		return err, nil
+	} else {
+		tx.Commit()
+	}
+
+	r, err := d.db.Query("select view_count from posts where id = ?", id)
+	if err != nil {
+		logging.Error("%s", err)
+		return err, nil
+	}
+	res := 0
+	for r.Next() {
+		err = r.Scan(&res)
+		if err != nil {
+			logging.Error("%s", err)
+			return err, nil
+		}
+	}
+	return nil, &res
+}
+
 func (d *Dao) NewArticle(data *model.ArticleData) error {
 	stmt, err := d.db.Prepare(`insert into posts(create_time, last_modified,
-                  title, content, tags, images, hide) values(?, ?, ?, ?, ?, ?, ?)`)
+                  title, content, tags, images, hide, view_count) values(?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return err
 	}
@@ -137,7 +175,7 @@ func (d *Dao) NewArticle(data *model.ArticleData) error {
 		return err
 	}
 	t := time.Now()
-	_, err = tx.Stmt(stmt).Exec(t, t, data.Title, data.Content, data.Tags, data.Images, true)
+	_, err = tx.Stmt(stmt).Exec(t, t, data.Title, data.Content, data.Tags, data.Images, true, 0)
 	if err != nil {
 		tx.Rollback()
 	} else {
@@ -234,7 +272,6 @@ func (d *Dao) UserLogin(id, pass string) error {
 	for rows.Next() {
 		count += 1
 	}
-
 	if count == 0 {
 		return errors.New("invalid id or pass")
 	}

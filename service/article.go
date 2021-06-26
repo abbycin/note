@@ -108,6 +108,7 @@ func NewArticle(cfg *conf.Config, dao *dbutil.Dao, r *routers.Router, middleware
 	}
 
 	r.GET(cfg.Model.Article.Api, a)
+	r.PUT(cfg.Model.Article.Api, a)
 
 	return a
 }
@@ -125,7 +126,7 @@ func (a *Article) build(post *model.ArticleData, navi *model.NaviData) ([]byte, 
 	})
 }
 
-func (a *Article) Serve(c *routers.Context) {
+func (a *Article) prepareUpdate(c *routers.Context) {
 	id := c.GetParam("id")
 	if id == "" {
 		c.Html(http.StatusNotFound, []byte("not found"))
@@ -155,6 +156,37 @@ func (a *Article) Serve(c *routers.Context) {
 	if includingHide {
 		a.cache.Remove(data.Name())
 	}
+}
+
+func (a *Article) incrViewCount(c *routers.Context) {
+	idStr := c.GetParam("id")
+
+	if idStr == "" {
+		c.Html(http.StatusNotFound, []byte("not found"))
+		return
+	}
+	id, err := strconv.ParseInt(idStr, 0, 64)
+	if err != nil || id < 1 {
+		c.Text(http.StatusBadRequest, "invalid id")
+	}
+	err, count := a.dao.IncrViewCount(int(id))
+	if err != nil {
+		c.Text(http.StatusInternalServerError, "action failed")
+	} else {
+		c.Text(http.StatusOK, strconv.FormatInt(int64(*count), 10))
+	}
+}
+
+func (a *Article) Serve(c *routers.Context) {
+	switch c.Req.Method {
+	case "GET":
+		a.prepareUpdate(c)
+	case "PUT":
+		a.incrViewCount(c)
+	default:
+		c.Json(http.StatusBadRequest, newError(-1, "unsupport request method"))
+	}
+
 }
 
 func (a *Article) Update(arg interface{}) {
