@@ -21,4 +21,5 @@ type ArticleData struct {
 	Tags         string    `json:"tags"`   // present as `,` split string
 	Images       string    `json:"images"` // present as json string, where key is link, value is name
 	Hide         bool      `json:"hide"`
+	ViewCount    int       `json:"view_count"`
 }
