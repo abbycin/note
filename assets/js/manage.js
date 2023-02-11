@@ -44,9 +44,11 @@ function toggleEye(id) {
             throw res.error;
         }
         if(hide) {
+            $(`#eye-${id}`).html("status: show");
             $(`#eye-${id}`).removeClass("glyphicon-eye-close").addClass("glyphicon-eye-open");
         }
         else {
+            $(`#eye-${id}`).html("status: hide");
             $(`#eye-${id}`).removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close");
         }
     }).catch(function(e) {
@@ -84,12 +86,14 @@ function buildTable(data) {
         }
         let ptag = `<td style="width: 20%">${arr.join('\n')}</td>`;
         let on = "open";
+        let status = "status: show";
         if(post.hide) {
+            status = "status: hide";
             on = "close";
         }
         let pop =
             `<td>
-                    <botton id="eye-${post.id}" class="btn btn-default glyphicon glyphicon-eye-${on}" onclick="toggleEye(${post.id});"></botton>
+                    <botton id="eye-${post.id}" class="btn btn-default glyphicon glyphicon-eye-${on}" onclick="toggleEye(${post.id});">${status}</botton>
                     <button class="btn btn-default glyphicon glyphicon-trash" onclick="deleteArticle(this, ${post.id});"></button>
                     <button type="button" class="btn btn-default glyphicon glyphicon-pencil" onclick="editArticle(${post.id});"></button>
                 </td>`;

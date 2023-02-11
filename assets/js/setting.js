@@ -179,8 +179,8 @@ function buildTable(data) {
         let ptarget = `<td style="width: 35%"><input style="width: 100%" id="dst-${nav.id}" type="text" value="${nav.target}"></td>`;
         let pop =
             `<td style="width: 20%">
-                    <button class="btn btn-default glyphicon glyphicon-trash" onclick="deleteNavi(this,${nav.id});"></button>
-                    <button class="btn btn-default glyphicon glyphicon-floppy-save" onclick="saveNavi(${nav.id});"></button>
+                    <button class="btn btn-default glyphicon glyphicon-trash" onclick="deleteNavi(this,${nav.id});">del</button>
+                    <button class="btn btn-default glyphicon glyphicon-floppy-save" onclick="saveNavi(${nav.id});">save</button>
                 </td>`;
 
         $('#navis').append(`<tr>${pid}${pseq}${pname}${ptarget}${pop}</tr>`);
