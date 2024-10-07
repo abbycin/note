@@ -181,8 +181,8 @@ func (a *Article) Serve(c *routers.Context) {
 	switch c.Req.Method {
 	case "GET":
 		a.prepareUpdate(c)
-	case "PUT":
-		a.incrViewCount(c)
+	//case "PUT":
+	//	a.incrViewCount(c)
 	default:
 		c.Json(http.StatusBadRequest, newError(-1, "unsupport request method"))
 	}
