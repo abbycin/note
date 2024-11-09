@@ -55,19 +55,8 @@ function create_toc() {
 
     // 将生成的目录插入到 toc div 中
     toc.append(list);
-
-    // 点击按钮切换目录的显示与隐藏
-    $('#toggle-toc').click(toggle_menu);
 }
 
 function toggle_menu() {
     $('#toc').toggleClass('collapsed'); // 切换 "collapsed" 类
-    var isCollapsed = $('#toc').hasClass('collapsed');
-
-    // 根据目录是否收起更新按钮文本
-    if (isCollapsed) {
-        $(this).text('展开'); // 收起时按钮显示 "展开"
-    } else {
-        $(this).text('收起'); // 展开时按钮显示 "收起"
-    }
 }

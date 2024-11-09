@@ -231,6 +231,10 @@ th, td {
     height: 100%;
 }
 
+body.mobile #toc-container {
+    display: none;
+}
+
 /* 目录容器 - 使其固定在页面左侧并垂直居中 */
 #toc-container {
     position: fixed; /* 固定在页面左侧 */
