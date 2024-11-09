@@ -55,6 +55,10 @@ function create_toc() {
 
     // 将生成的目录插入到 toc div 中
     toc.append(list);
+
+    if (list.children().length === 0) {
+        $('#toc-container').css('display', 'none');
+    }
 }
 
 function toggle_menu() {
