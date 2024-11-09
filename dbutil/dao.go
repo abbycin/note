@@ -36,7 +36,7 @@ func NewDao(dbFile string) *Dao {
     	id integer primary key,
     	create_time timestamp,
     	last_modified timestamp,
-    	title varchar(50),
+    	title varchar(200),
     	content text,
     	tags text,
     	images text,

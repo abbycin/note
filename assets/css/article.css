@@ -32,38 +32,47 @@ P, li {
 
 H1 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: #000;
 }
 
 H2 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
+    font-weight: bold;
+    font-size: 28px;
     margin-bottom: 60px;
     margin-bottom: 40px;
     padding: 5px;
     border-bottom: 2px LightGrey solid;
     width: 98%;
     line-height: 150%;
-    color: #666666;
+    color: #000;
 }
 
 H3 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
+    font-weight: bold;
+    font-size: 24px;
     margin-top: 20px;
     margin-bottom: 10px;
     border-bottom: 1px LightGrey solid;
     width: 98%;
     line-height: 120%;
-    color: #666666;
+    color: #000;
 }
 
 
 H4 {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
+    font-weight: bold;
+    font-size: 20px;
     margin-top: 40px;
     margin-bottom: 30px;
     border-bottom: 1px LightGrey solid;
     width: 98%;
     line-height: 150%;
-    color: #666666;
+    color: #000;
 }
 
 .box {
@@ -91,7 +100,7 @@ pre {
     background-color: #F4F4F4;
     border: 1px solid #E0E0E0;
     border-radius: 4px;
-    padding: 5px;
+    padding: 0px;
     line-height: 1.3;
 
     display: block;
@@ -125,13 +134,13 @@ img {
     max-height: 100%;
     max-width: 100%;
     display: block;
-    box-shadow: 0 0 10px #555;
-    border-radius: 6px;
+    box-shadow: 0 0 2px #555;
+    border-radius: 3px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 10px;
     margin-bottom: 10px;
-    -webkit-box-shadow: 0 0 10px #555;
+    -webkit-box-shadow: 0 0 2px #555;
 }
 
 img.displayed {
@@ -167,22 +176,6 @@ body.mobile div.inner {
     padding: 2% 4% 4% 4%;
 }
 
-.left {
-    float: left;
-    clear: both;
-    width: 50%;
-    padding: 25 24 25 0;
-    border-top: 1px solid lightblue;
-}
-
-.right {
-    float: left;
-    clear: none;
-    width: 50%;
-    padding: 25 0 25 24;
-    border-top: 1px solid lightblue;
-}
-
 .row:after {
     content: "";
     display: table;
@@ -209,6 +202,14 @@ body.mobile div.inner {
     font-size: 100%;
 }
 
+code {
+	padding: 2px 4px;
+	font-size: 90%;
+	color: #000;
+	background-color: #f2f5f5;
+	border-radius: 4px;
+}
+
 table {
 	border-collapse: collapse;
 	width: 100%;
@@ -220,4 +221,88 @@ th, td {
 	border-right: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 	padding: 0.6rem;
+}
+
+/* --------------------------- */
+
+/* 使用 Flexbox 包裹容器，确保页面内容和目录容器在同一行 */
+.wrapper {
+    display: flex;
+    height: 100%;
+}
+
+body.mobile #toc-container {
+    display: none;
+}
+
+/* 目录容器 - 使其固定在页面左侧并垂直居中 */
+#toc-container {
+    position: fixed; /* 固定在页面左侧 */
+    top: 50%; /* 使容器垂直居中 */
+    transform: translateY(-50%); /* 实现精确的垂直居中 */
+    left: 0;
+    width: 250px; /* 目录容器宽度 */
+    background-color: rgba(255, 255, 255, 0); /* 透明背景，白色并设置透明度为 70% */
+    padding-top: 10px; /* 给目录内部增加一些内边距 */
+    z-index: 10; /* 确保目录在导航栏和内容区之上 */
+    display: flex;
+    flex-direction: column; /* 使目录项目垂直排列 */
+    /*box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); !* 为目录容器添加阴影，使其更加显眼 *!*/
+}
+
+/* 目录区域的样式 */
+#toc {
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* 让目录可以滚动 */
+    display: block; /* 初始时显示 */
+    transition: max-height 0.3s ease; /* 添加过渡动画 */
+    max-height: 1000px; /* 最大高度设置为一个大值 */
+    margin-top: 10px; /* 给按钮和目录之间增加一些间距 */
+}
+
+/* 隐藏目录时，max-height 设置为 0 */
+#toc.collapsed {
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* 让目录链接更美观 */
+#toc a {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+#toc a:hover {
+    text-decoration: underline;
+}
+
+/* 目录项之间的间距 */
+#toc ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+#toc li {
+    margin-bottom: 10px;
+}
+
+/* 闪烁效果的关键帧 */
+@keyframes flash {
+    0% {
+        background-color: #6ccce8;
+    }
+    50% {
+        background-color: transparent;
+    }
+    100% {
+        background-color: #0088ff;
+    }
+}
+
+/* 被选中标题的闪烁效果 */
+h1:target, h2:target, h3:target, h4:target, h5:target, h6:target {
+    animation: flash 1s ease-out;
+    transition: background-color 0.5s ease;
 }

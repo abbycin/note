@@ -13,6 +13,7 @@
     <link href="/static/css/article.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/static/css/highlightjs/styles/tomorrow.css">
     <script src="/static/js/highlight.pack.js"></script>
+    <script src="/static/js/article.js"></script>
     <link rel="shortcut icon" href="/static/favicon.png">
     <title>{{.Post.Title}}</title>
 
@@ -37,6 +38,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand navi" style="font-size: 24px" href="javascript:toHome();">Home</a>
+            <a class="navbar-brand navi" style="font-size: 24px" href="javascript:toggle_menu();">Menu</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -48,7 +50,11 @@
         </div>
     </div>
 </nav>
-
+<div class="wrapper">
+    <div id="toc-container">
+        <div id="toc"></div> <!-- 目录 -->
+    </div>
+</div>
 <div class="inner" id="article">
     <h1 id="title">{{ .Post.Title }}</h1>
     {{ .Post.Content | markup }}
@@ -70,6 +76,7 @@
     }
 
     setTimeout(sendCount({{.Post.Id}}), 1000);
+    $(document).ready(create_toc);
 </script>
 <script>hljs.initHighlightingOnLoad();</script>
 </body>
