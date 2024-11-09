@@ -176,22 +176,6 @@ body.mobile div.inner {
     padding: 2% 4% 4% 4%;
 }
 
-.left {
-    float: left;
-    clear: both;
-    width: 50%;
-    padding: 25 24 25 0;
-    border-top: 1px solid lightblue;
-}
-
-.right {
-    float: left;
-    clear: none;
-    width: 50%;
-    padding: 25 0 25 24;
-    border-top: 1px solid lightblue;
-}
-
 .row:after {
     content: "";
     display: table;
@@ -237,4 +221,84 @@ th, td {
 	border-right: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 	padding: 0.6rem;
+}
+
+/* --------------------------- */
+
+/* 使用 Flexbox 包裹容器，确保页面内容和目录容器在同一行 */
+.wrapper {
+    display: flex;
+    height: 100%;
+}
+
+/* 目录容器 - 使其固定在页面左侧并垂直居中 */
+#toc-container {
+    position: fixed; /* 固定在页面左侧 */
+    top: 50%; /* 使容器垂直居中 */
+    transform: translateY(-50%); /* 实现精确的垂直居中 */
+    left: 0;
+    width: 250px; /* 目录容器宽度 */
+    background-color: rgba(255, 255, 255, 0); /* 透明背景，白色并设置透明度为 70% */
+    padding-top: 10px; /* 给目录内部增加一些内边距 */
+    z-index: 10; /* 确保目录在导航栏和内容区之上 */
+    display: flex;
+    flex-direction: column; /* 使目录项目垂直排列 */
+    /*box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); !* 为目录容器添加阴影，使其更加显眼 *!*/
+}
+
+/* 目录区域的样式 */
+#toc {
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* 让目录可以滚动 */
+    display: block; /* 初始时显示 */
+    transition: max-height 0.3s ease; /* 添加过渡动画 */
+    max-height: 1000px; /* 最大高度设置为一个大值 */
+    margin-top: 10px; /* 给按钮和目录之间增加一些间距 */
+}
+
+/* 隐藏目录时，max-height 设置为 0 */
+#toc.collapsed {
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* 让目录链接更美观 */
+#toc a {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+#toc a:hover {
+    text-decoration: underline;
+}
+
+/* 目录项之间的间距 */
+#toc ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+#toc li {
+    margin-bottom: 10px;
+}
+
+/* 闪烁效果的关键帧 */
+@keyframes flash {
+    0% {
+        background-color: #6ccce8;
+    }
+    50% {
+        background-color: transparent;
+    }
+    100% {
+        background-color: #0088ff;
+    }
+}
+
+/* 被选中标题的闪烁效果 */
+h1:target, h2:target, h3:target, h4:target, h5:target, h6:target {
+    animation: flash 1s ease-out;
+    transition: background-color 0.5s ease;
 }
