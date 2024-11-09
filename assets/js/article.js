@@ -39,16 +39,13 @@ function create_toc() {
         // 如果栈为空，说明是一个顶级目录
         if (stack.length === 0) {
             list.append(listItem); // 直接添加到根目录
-            console.log("add to root " + text);
         } else {
             // 否则，找到父级并添加子目录
 //            var parentList = stack[stack.length - 1][1].find('ul');
 //            if (parentList.length === 0) {
                 parentList = $('<ul></ul>');
-                console.log("build subroot " + text);
                 stack[stack.length - 1][1].append(parentList);
 //            }
-            console.log("insert to submen " + text);
             parentList.append(listItem);
         }
 
