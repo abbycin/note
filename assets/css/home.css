@@ -9,7 +9,7 @@ table {
 /* end reset CSS */
 
 body {
-    font-family: STFangSong, Helvetica, Arial, Vernada, Tahoma, STXihei, "Microsoft YaHei", "Songti SC", SimSun, Heiti, sans-serif;
+    font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans;
     font-size: 21px;
 }
 
@@ -18,7 +18,7 @@ body.mobile {
 }
 
 .navbar-brand {
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, Helvetica, STKaiti, SimSun, serif;
+    font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans;
     font-size: 100%;
 }
 
@@ -67,7 +67,7 @@ body.mobile .navbar-nav {
 }
 
 div.outer {
-    margin: 5% 10% 2% 10%;
+    margin: 2% 20% 2% 20%;
 }
 
 div.date {
