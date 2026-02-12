@@ -32,13 +32,35 @@
         <div class="main-layout fade-in">
             <!-- Article List -->
             <div class="main-content">
+                <div class="tags-mobile">
+                    <details>
+                        <summary>按标签筛选</summary>
+                        <div class="tags-list">
+                            {{if .CurrentTag}}
+                                <a href="/" class="tag">全部</a>
+                            {{else}}
+                                <span class="tag active">全部</span>
+                            {{end}}
+                            {{range .Tags}}
+                                {{if eq . $.CurrentTag}}
+                                    <span class="tag active">{{.}}</span>
+                                {{else}}
+                                    <a href="/tag/{{.}}" class="tag">{{.}}</a>
+                                {{end}}
+                            {{end}}
+                        </div>
+                    </details>
+                </div>
                 <div class="card">
                     <ul class="post-list">
                         {{range .Posts}}
                             <li class="post-item">
                                 <a href="{{.Link}}">{{.Title}}</a>
                                 <div class="post-meta">
-                                    <span class="post-date">{{.Date | formatTime}}</span>
+                                    <span class="post-date">
+                                        <span class="post-date-only">{{.Date | formatDate}}</span>
+                                        <span class="post-time-only">{{.Date | formatClock}}</span>
+                                    </span>
                                     {{if .Tags}}
                                         <div class="post-tags-inline">
                                             {{range .Tags}}

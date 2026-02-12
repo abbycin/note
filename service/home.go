@@ -201,7 +201,11 @@ func NewHome(cfg *conf.Config, dao *dbutil.Dao, r *routers.Router) *Home {
 }
 
 func (h *Home) build(posts []Post, navis *model.NaviData, allTags []string, currentTag string, pagination Pagination) ([]byte, error) {
-	h.model.Funcs(template.FuncMap{"formatTime": h.formatTime})
+	h.model.Funcs(template.FuncMap{
+		"formatTime":  h.formatTime,
+		"formatDate":  h.formatDate,
+		"formatClock": h.formatClock,
+	})
 	return h.model.Parse(map[string]interface{}{
 		"Title":      h.cfg.Model.Title,
 		"Posts":      posts,
@@ -254,6 +258,14 @@ func (h *Home) Serve(c *routers.Context) {
 
 func (h *Home) formatTime(arg interface{}) string {
 	return arg.(time.Time).Format("2006-01-02 15:04:05")
+}
+
+func (h *Home) formatDate(arg interface{}) string {
+	return arg.(time.Time).Format("2006-01-02")
+}
+
+func (h *Home) formatClock(arg interface{}) string {
+	return arg.(time.Time).Format("15:04:05")
 }
 
 func (h *Home) Update(arg interface{}) {

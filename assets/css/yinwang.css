@@ -149,6 +149,23 @@ a:hover {
   align-items: center;
 }
 
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: rgb(var(--theme-600));
+  text-decoration: none;
+}
+
 .navbar-brand {
   font-size: 1.5rem;
   font-weight: 700;
@@ -267,6 +284,14 @@ a:hover {
   color: var(--text-muted);
   font-weight: 400;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.post-date-only,
+.post-time-only {
+  color: var(--text-muted);
 }
 
 /* Article Page */
@@ -492,6 +517,10 @@ a:hover {
   .toc-container {
     display: none;
   }
+
+  .toc-link {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -526,6 +555,18 @@ a:hover {
     flex-direction: column;
     gap: var(--space-sm);
   }
+
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+
+  .nav-left {
+    gap: var(--space-md);
+  }
+
+  .nav-link {
+    font-size: 0.95rem;
+  }
   
   .article-container {
     padding: var(--space-lg) var(--space-md);
@@ -541,6 +582,18 @@ a:hover {
   
   .page-header h1 {
     font-size: 1.75rem;
+  }
+
+  .tags-mobile {
+    display: block;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .post-time-only {
+    display: none;
   }
 }
 
@@ -586,6 +639,44 @@ a:hover {
 }
 
 /* Tags */
+.tags-mobile {
+  display: none;
+  margin-bottom: var(--space-md);
+}
+
+.tags-mobile details {
+  background-color: var(--bg-card);
+  border: 1px solid rgb(var(--gray-200));
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm) var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.tags-mobile summary {
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 500;
+  list-style: none;
+}
+
+.tags-mobile summary::-webkit-details-marker {
+  display: none;
+}
+
+.tags-mobile summary::after {
+  content: "+";
+  float: right;
+  color: var(--text-muted);
+}
+
+.tags-mobile details[open] summary::after {
+  content: "-";
+}
+
+.tags-mobile .tags-list {
+  margin-top: var(--space-sm);
+}
+
 .tags-container {
   margin-bottom: var(--space-xl);
 }
@@ -650,7 +741,7 @@ a:hover {
   background: none !important;
   border: none !important;
   padding: 0 !important;
-  margin: 0 0 0 8px !important;
+  margin: 0 !important;
 }
 
 .post-meta .post-tags-inline .post-tag:hover,
