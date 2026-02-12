@@ -1,83 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Post.Title}}</title>
+    <link rel="shortcut icon" href="/static/favicon.png">
+    <link href="/static/css/yinwang.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/static/css/highlightjs/styles/github.css">
     <script src="/static/js/jquery/jquery.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/bootstrap@3.3.1/dist/js/bootstrap.min.js"></script>
-    <link href="//cdn.jsdelivr.net/npm/bootstrap@3.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-        MathJax.Hub.Config({
-            tex2jax: {inlineMath: [['\\(','\\)']]}
-        });
-    </script>
-    <link href="/static/css/article.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/static/css/highlightjs/styles/tomorrow.css">
+    <script async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="/static/js/highlight.pack.js"></script>
     <script src="/static/js/article.js"></script>
-    <link rel="shortcut icon" href="/static/favicon.png">
-    <title>{{.Post.Title}}</title>
-
 </head>
-　　
 <body>
-<script>
-    if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
-    {
-        document.body.classList.add('mobile');
-    }
-</script>
-
-<nav class="navbar navbar-default navbar-fixed-top" style="opacity: .8; color: gray" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <a class="navbar-brand" href="/" onclick="event.preventDefault(); toHome();">Home</a>
+                <a href="javascript:toggleToc();" style="color: var(--text-secondary); font-weight: 500; text-decoration: none;">目录</a>
+            </div>
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
-            <a class="navbar-brand navi" style="font-size: 24px" href="javascript:toHome();">Home</a>
-            <a class="navbar-brand navi" style="font-size: 24px" href="javascript:toggle_menu();">Menu</a>
+            <div class="navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav">
+                    {{range .Navis.Navis}}
+                        <li><a href="//{{.Target}}">{{.Name}}</a></li>
+                    {{end}}
+                </ul>
+            </div>
         </div>
+    </nav>
 
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                {{range .Navis.Navis}}
-                    <li><a class="navbar-brand navi" href="//{{.Target}}">{{.Name}}</a></li>
-                {{end}}
-            </ul>
+    <!-- Table of Contents -->
+    <div class="toc-container" id="tocContainer">
+        <div class="toc-title">目录</div>
+        <div id="toc"></div>
+    </div>
+
+    <!-- Article Content -->
+    <article class="article-container fade-in">
+        <header class="article-header">
+            <h1 class="article-title">{{.Post.Title}}</h1>
+            <div class="article-meta">
+                <span>阅读时间约 {{.Post.Content | readTime}} 分钟</span>
+            </div>
+        </header>
+
+        <div class="article-content" id="article">
+            {{.Post.Content | markup}}
         </div>
-    </div>
-</nav>
-<div class="wrapper">
-    <div id="toc-container">
-        <div id="toc"></div> <!-- 目录 -->
-    </div>
-</div>
-<div class="inner" id="article">
-    <h1 id="title">{{ .Post.Title }}</h1>
-    {{ .Post.Content | markup }}
-</div>
+    </article>
 
-<script>
-    function toHome() {
-        window.location.href = "/"
-    }
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{.Year}} AbbyCin</p>
+        </div>
+    </footer>
 
-    function sendCount(id) {
-        fetch(`/article/${id}`, {method: 'PUT'}).then(function(j) {
-            return j.text();
-        }).then(function(res) {
-            console.log(res);
-        }).catch(function(e) {
-            console.log(e);
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Toggle TOC visibility
+        function toggleToc() {
+            const toc = document.getElementById('tocContainer');
+            toc.style.display = toc.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Navigate to home
+        function toHome() {
+            window.location.href = "/";
+        }
+
+        // Send view count
+        function sendCount(id) {
+            fetch(`/article/${id}`, {method: 'PUT'})
+                .then(function(j) { return j.text(); })
+                .then(function(res) { console.log(res); })
+                .catch(function(e) { console.log(e); });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Detect mobile
+            if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+                document.body.classList.add('mobile');
+                document.getElementById('tocContainer').style.display = 'none';
+            }
+
+            // Generate TOC
+            if (typeof create_toc === 'function') {
+                create_toc();
+            }
+
+            // Initialize highlight.js
+            if (typeof hljs !== 'undefined') {
+                hljs.initHighlightingOnLoad();
+            }
+
+            // Send view count
+            setTimeout(function() {
+                sendCount({{.Post.Id}});
+            }, 1000);
         });
-    }
 
-    setTimeout(sendCount({{.Post.Id}}), 1000);
-    $(document).ready(create_toc);
-</script>
-<script>hljs.initHighlightingOnLoad();</script>
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const navbar = document.querySelector('.navbar');
+            const menu = document.getElementById('navbarMenu');
+            if (!navbar.contains(e.target) && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>

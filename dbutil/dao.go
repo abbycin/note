@@ -213,7 +213,20 @@ func (d *Dao) HideArticle(id int, hide bool) error {
 }
 
 func (d *Dao) GetPosts() (*model.ManageData, error) {
-	rows, err := d.db.Query(`select id, title, create_time, last_modified, tags, hide from posts order by create_time desc`)
+	return d.GetPostsByPage(0, 0)
+}
+
+func (d *Dao) GetPostsByPage(page, pageSize int) (*model.ManageData, error) {
+	var rows *sql.Rows
+	var err error
+
+	if pageSize > 0 {
+		offset := page * pageSize
+		rows, err = d.db.Query(`select id, title, create_time, last_modified, tags, hide from posts where hide = 0 order by create_time desc limit ? offset ?`, pageSize, offset)
+	} else {
+		rows, err = d.db.Query(`select id, title, create_time, last_modified, tags, hide from posts where hide = 0 order by create_time desc`)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -226,13 +239,27 @@ func (d *Dao) GetPosts() (*model.ManageData, error) {
 		if err != nil {
 			return nil, err
 		}
-		post.Tags = strings.Split(tags, ",")
+		rawTags := strings.Split(tags, ",")
+		post.Tags = make([]string, 0, len(rawTags))
+		for _, tag := range rawTags {
+			tag = strings.TrimSpace(tag)
+			if tag != "" {
+				post.Tags = append(post.Tags, tag)
+			}
+		}
 		posts = append(posts, post)
 	}
 	res := &model.ManageData{
 		Posts: posts,
 	}
 	return res, nil
+}
+
+func (d *Dao) GetPostsCount() (int, error) {
+	row := d.db.QueryRow("select count(*) from posts where hide = 0")
+	var count int
+	err := row.Scan(&count)
+	return count, err
 }
 
 func (d *Dao) UserLogin(id, pass string) error {
@@ -316,6 +343,85 @@ func (d *Dao) GetNavis() (*model.NaviData, error) {
 	return &model.NaviData{
 		Navis: navis,
 	}, nil
+}
+
+// GetAllTags 获取所有标签
+func (d *Dao) GetAllTags() ([]string, error) {
+	rows, err := d.db.Query("select tags from posts where hide = 0")
+	if err != nil {
+		return nil, err
+	}
+
+	tagMap := make(map[string]bool)
+	for rows.Next() {
+		var tags string
+		err = rows.Scan(&tags)
+		if err != nil {
+			continue
+		}
+		if tags != "" {
+			for _, tag := range strings.Split(tags, ",") {
+				tag = strings.TrimSpace(tag)
+				if tag != "" {
+					tagMap[tag] = true
+				}
+			}
+		}
+	}
+
+	// 转换为切片并排序
+	result := make([]string, 0, len(tagMap))
+	for tag := range tagMap {
+		result = append(result, tag)
+	}
+	// 简单排序
+	for i := 0; i < len(result); i++ {
+		for j := i + 1; j < len(result); j++ {
+			if result[i] > result[j] {
+				result[i], result[j] = result[j], result[i]
+			}
+		}
+	}
+	return result, nil
+}
+
+// GetPostsByTag 根据标签获取文章
+func (d *Dao) GetPostsByTag(tag string) (*model.ManageData, error) {
+	rows, err := d.db.Query(`select id, title, create_time, last_modified, tags, hide from posts 
+		where hide = 0 and tags like ? order by create_time desc`, "%"+tag+"%")
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]model.Post, 0)
+	for rows.Next() {
+		post := model.Post{}
+		tags := ""
+		err = rows.Scan(&post.Id, &post.Title, &post.CreateTime, &post.LastModified, &tags, &post.Hidden)
+		if err != nil {
+			return nil, err
+		}
+		// 检查标签是否匹配（避免部分匹配）
+		rawTags := strings.Split(tags, ",")
+		postTags := make([]string, 0, len(rawTags))
+		for _, t := range rawTags {
+			t = strings.TrimSpace(t)
+			if t != "" {
+				postTags = append(postTags, t)
+			}
+		}
+		for _, t := range postTags {
+			if t == tag {
+				post.Tags = postTags
+				posts = append(posts, post)
+				break
+			}
+		}
+	}
+	res := &model.ManageData{
+		Posts: posts,
+	}
+	return res, nil
 }
 
 func (d *Dao) UpdateNavi(data *model.Navi) error {

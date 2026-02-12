@@ -118,11 +118,54 @@ func (a *Article) markup(args interface{}) template.HTML {
 	return template.HTML(s)
 }
 
+func (a *Article) readTime(args interface{}) int {
+	content := args.(string)
+	// 平均阅读速度：每分钟 300 个中文字符
+	chineseCount := 0
+	for _, r := range content {
+		if r > 127 {
+			chineseCount++
+		}
+	}
+	minutes := chineseCount / 300
+	if minutes < 1 {
+		minutes = 1
+	}
+	return minutes
+}
+
+func (a *Article) ellipsis(args ...interface{}) string {
+	var s string
+	maxLen := 15
+
+	// 处理管道参数顺序：{{.Title | ellipsis 15}} -> ellipsis(15, .Title)
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case string:
+			s = v
+		case int:
+			maxLen = v
+		case int64:
+			maxLen = int(v)
+		}
+	}
+
+	if len(s) > maxLen {
+		return s[:maxLen] + "..."
+	}
+	return s
+}
+
 func (a *Article) build(post *model.ArticleData, navi *model.NaviData) ([]byte, error) {
-	a.model.Funcs(template.FuncMap{"markup": a.markup})
+	a.model.Funcs(template.FuncMap{
+		"markup":   a.markup,
+		"readTime": a.readTime,
+		"ellipsis": a.ellipsis,
+	})
 	return a.model.Parse(map[string]interface{}{
 		"Post":  post,
 		"Navis": navi,
+		"Year":  time.Now().Year(),
 	})
 }
 

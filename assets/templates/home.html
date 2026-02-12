@@ -1,56 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <script src="/static/js/jquery/jquery.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/bootstrap@3.3.1/dist/js/bootstrap.min.js"></script>
-    <link href="//cdn.jsdelivr.net/npm/bootstrap@3.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/home.css" rel="stylesheet" type="text/css">
-    <link rel="shortcut icon" href="/static/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
+    <link rel="shortcut icon" href="/static/favicon.png">
+    <link href="/static/css/yinwang.css" rel="stylesheet" type="text/css">
 </head>
-　　
 <body>
-<script>
-    if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
-    {
-        document.body.classList.add('mobile');
-    }
-</script>
-
-<nav class="navbar navbar-default navbar-fixed-top" style="opacity: .9" role="navigation">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">{{.Title}}</a>
+            <button class="navbar-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
-            <a class="navbar-brand" href="#">{{.Title}}</a>
+            <div class="navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav">
+                    {{range .Navis.Navis}}
+                        <li><a href="{{.Target}}">{{.Name}}</a></li>
+                    {{end}}
+                </ul>
+            </div>
         </div>
+    </nav>
 
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                {{range .Navis.Navis}}
-                    <li><a class="navbar-brand" href="{{.Target}}">{{.Name}}</a></li>
+    <!-- Main Content -->
+    <main class="container" style="padding-top: 2rem;">
+        <div class="main-layout fade-in">
+            <!-- Article List -->
+            <div class="main-content">
+                <div class="card">
+                    <ul class="post-list">
+                        {{range .Posts}}
+                            <li class="post-item">
+                                <a href="{{.Link}}">{{.Title}}</a>
+                                <div class="post-meta">
+                                    <span class="post-date">{{.Date | formatTime}}</span>
+                                    {{if .Tags}}
+                                        <div class="post-tags-inline">
+                                            {{range .Tags}}
+                                                {{if .}}
+                                                    <a href="/tag/{{.}}" class="post-tag">{{.}}</a>
+                                                {{end}}
+                                            {{end}}
+                                        </div>
+                                    {{end}}
+                                </div>
+                            </li>
+                        {{end}}
+                    </ul>
+                </div>
+
+                <!-- Pagination -->
+                {{if gt .Pagination.TotalPages 1}}
+                    <div class="pagination">
+                        {{if .Pagination.HasPrev}}
+                            <a href="/page/{{.Pagination.PrevPage}}" class="pagination-link">← 上一页</a>
+                        {{else}}
+                            <span class="pagination-link disabled">← 上一页</span>
+                        {{end}}
+
+                        {{range .Pagination.Pages}}
+                            {{if eq . $.Pagination.CurrentPage}}
+                                <span class="pagination-link active">{{.}}</span>
+                            {{else}}
+                                <a href="/page/{{.}}" class="pagination-link">{{.}}</a>
+                            {{end}}
+                        {{end}}
+
+                        {{if .Pagination.HasNext}}
+                            <a href="/page/{{.Pagination.NextPage}}" class="pagination-link">下一页 →</a>
+                        {{else}}
+                            <span class="pagination-link disabled">下一页 →</span>
+                        {{end}}
+                    </div>
                 {{end}}
-            </ul>
+            </div>
+
+            <!-- Sidebar with Tags -->
+            <aside class="sidebar">
+                <div class="sidebar-card">
+                    <div class="tags-container">
+                        <div class="tags-title">按标签筛选</div>
+                        <div class="tags-list">
+                            {{if .CurrentTag}}
+                                <a href="/" class="tag">全部</a>
+                            {{else}}
+                                <span class="tag active">全部</span>
+                            {{end}}
+                            {{range .Tags}}
+                                {{if eq . $.CurrentTag}}
+                                    <span class="tag active">{{.}}</span>
+                                {{else}}
+                                    <a href="/tag/{{.}}" class="tag">{{.}}</a>
+                                {{end}}
+                            {{end}}
+                        </div>
+                    </div>
+                </div>
+            </aside>
         </div>
-    </div>
-</nav>
+    </main>
 
-<div class="outer">
-    <ul class="list-group">
-        {{range .Posts }}
-            <li class="list-group-item title">
-                <div class="date">{{.Date | formatTime }}</div><br>
-                <a href="{{.Link}}">{{.Title}}</a>
-            </li>
-        {{end}}
-    </ul>
-</div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{.Year}} AbbyCin</p>
+        </div>
+    </footer>
 
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const menu = document.getElementById('navbarMenu');
+            menu.classList.toggle('active');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const navbar = document.querySelector('.navbar');
+            const menu = document.getElementById('navbarMenu');
+            if (!navbar.contains(e.target) && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // Detect mobile device
+        if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent)) {
+            document.body.classList.add('mobile');
+        }
+    </script>
 </body>
 </html>
