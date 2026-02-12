@@ -6,7 +6,7 @@
     <title>{{.Post.Title}}</title>
     <link rel="shortcut icon" href="/static/favicon.png">
     <link href="/static/css/yinwang.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/static/css/highlightjs/styles/github.css">
+    <link rel="stylesheet" href="/static/css/highlightjs/styles/tomorrow.css">
     <script src="/static/js/jquery/jquery.min.js"></script>
     <script async src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="/static/js/highlight.pack.js"></script>
@@ -101,9 +101,11 @@
                 create_toc();
             }
 
-            // Initialize highlight.js
+            // Initialize highlight.js - highlight all code blocks
             if (typeof hljs !== 'undefined') {
-                hljs.initHighlightingOnLoad();
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
+                });
             }
 
             // Send view count

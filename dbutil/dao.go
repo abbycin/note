@@ -15,12 +15,36 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"regexp"
 	"strings"
 	"time"
 )
 
 type Dao struct {
 	db *sql.DB
+}
+
+// sanitizeTag 清理标签输入，防止注入攻击
+func sanitizeTag(tag string) string {
+	// 移除特殊字符，只允许字母、数字、中文、空格和常见符号
+	re := regexp.MustCompile(`[^\w\s\-\u4e00-\u9fa5]`)
+	tag = re.ReplaceAllString(tag, "")
+	// 限制长度
+	if len(tag) > 50 {
+		tag = tag[:50]
+	}
+	return strings.TrimSpace(tag)
+}
+
+// sanitizeInput 清理一般输入
+func sanitizeInput(input string, maxLen int) string {
+	if len(input) > maxLen {
+		input = input[:maxLen]
+	}
+	// 移除 null 字节和危险字符
+	input = strings.ReplaceAll(input, "\x00", "")
+	input = strings.ReplaceAll(input, "\x1a", "")
+	return input
 }
 
 func NewDao(dbFile string) *Dao {
@@ -231,9 +255,9 @@ func (d *Dao) GetPostsByPage(page, pageSize int) (*model.ManageData, error) {
 		return nil, err
 	}
 
-	posts := make([]model.Post, 0)
+	posts := make([]model.PostInfo, 0)
 	for rows.Next() {
-		post := model.Post{}
+		post := model.PostInfo{}
 		tags := ""
 		err = rows.Scan(&post.Id, &post.Title, &post.CreateTime, &post.LastModified, &tags, &post.Hidden)
 		if err != nil {
@@ -331,9 +355,9 @@ func (d *Dao) GetNavis() (*model.NaviData, error) {
 		return nil, err
 	}
 
-	navis := make([]model.Navi, 0)
+	navis := make([]model.NaviInfo, 0)
 	for rows.Next() {
-		var data model.Navi
+		var data model.NaviInfo
 		err = rows.Scan(&data.Id, &data.Sequence, &data.Name, &data.Target)
 		if err != nil {
 			return nil, err
@@ -393,9 +417,9 @@ func (d *Dao) GetPostsByTag(tag string) (*model.ManageData, error) {
 		return nil, err
 	}
 
-	posts := make([]model.Post, 0)
+	posts := make([]model.PostInfo, 0)
 	for rows.Next() {
-		post := model.Post{}
+		post := model.PostInfo{}
 		tags := ""
 		err = rows.Scan(&post.Id, &post.Title, &post.CreateTime, &post.LastModified, &tags, &post.Hidden)
 		if err != nil {
@@ -424,7 +448,7 @@ func (d *Dao) GetPostsByTag(tag string) (*model.ManageData, error) {
 	return res, nil
 }
 
-func (d *Dao) UpdateNavi(data *model.Navi) error {
+func (d *Dao) UpdateNavi(data *model.NaviInfo) error {
 	stmt, err := d.db.Prepare("update navis set sequence = ?, name = ?, target = ? where id = ?")
 	if err != nil {
 		return err
@@ -442,7 +466,7 @@ func (d *Dao) UpdateNavi(data *model.Navi) error {
 	return nil
 }
 
-func (d *Dao) NewNavi(data *model.Navi) error {
+func (d *Dao) NewNavi(data *model.NaviInfo) error {
 	stmt, err := d.db.Prepare("insert into navis(sequence, name, target) values(?, ?, ?)")
 	if err != nil {
 		return err

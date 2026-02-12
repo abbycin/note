@@ -71,7 +71,7 @@ func (h *home) Write(c *routers.Context) {
 	}
 }
 
-func (h *home) Makelink(p *model.Post) template.URL {
+func (h *home) Makelink(p *model.PostInfo) template.URL {
 	r := path.Join(h.h.article, fmt.Sprintf("%v", p.Id))
 	return template.URL(r)
 }

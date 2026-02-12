@@ -19,6 +19,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -114,8 +115,28 @@ func NewArticle(cfg *conf.Config, dao *dbutil.Dao, r *routers.Router, middleware
 }
 
 func (a *Article) markup(args interface{}) template.HTML {
-	s := blackfriday.Run([]byte(args.(string)), blackfriday.WithExtensions(blackfriday.CommonExtensions))
-	return template.HTML(s)
+	content := []byte(args.(string))
+	output := blackfriday.Run(content, blackfriday.WithExtensions(blackfriday.CommonExtensions))
+
+	// Add hljs class to code blocks for syntax highlighting
+	output = addHljsClass(output)
+
+	return template.HTML(output)
+}
+
+// addHljsClass adds hljs and language classes to code blocks
+func addHljsClass(html []byte) []byte {
+	result := string(html)
+
+	// Pattern 1: <pre><code class="language-xxx"> -> <pre><code class="hljs language-xxx">
+	re := regexp.MustCompile(`<pre><code class="language-([^"]+)">`)
+	result = re.ReplaceAllString(result, `<pre><code class="hljs language-$1">`)
+
+	// Pattern 2: <pre><code> -> <pre><code class="hljs">
+	re2 := regexp.MustCompile(`<pre><code>([^c])`)
+	result = re2.ReplaceAllString(result, `<pre><code class="hljs">$1`)
+
+	return []byte(result)
 }
 
 func (a *Article) readTime(args interface{}) int {

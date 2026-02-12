@@ -61,7 +61,7 @@ func (n *Navi) HandleGet(c *routers.Context) {
 }
 
 func (n *Navi) HandlePut(c *routers.Context) {
-	var data model.Navi
+	var data model.NaviInfo
 	err := c.Unmarshal(&data)
 	if err != nil {
 		c.Json(http.StatusBadRequest, newError(-1, "invalid request"))
@@ -78,7 +78,7 @@ func (n *Navi) HandlePut(c *routers.Context) {
 }
 
 func (n *Navi) HandlePost(c *routers.Context) {
-	var data model.Navi
+	var data model.NaviInfo
 	err := c.Unmarshal(&data)
 	if err != nil {
 		logging.Error("unmarshal: %s", err)

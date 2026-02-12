@@ -271,7 +271,7 @@ a:hover {
 
 /* Article Page */
 .article-container {
-  max-width: 800px;
+  max-width: 880px;
   margin: 0 auto;
   padding: var(--space-2xl) var(--space-lg);
 }
@@ -340,12 +340,13 @@ a:hover {
 }
 
 .article-content pre {
-  background-color: rgb(var(--gray-800));
-  color: rgb(var(--gray-100));
+  background-color: #f7f7f7;
+  color: #4d4d4c;
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
   overflow-x: auto;
   margin: var(--space-lg) 0;
+  border: 1px solid rgb(var(--gray-200));
 }
 
 .article-content pre code {

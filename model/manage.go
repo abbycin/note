@@ -24,8 +24,8 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 	return []byte(stamp), nil
 }
 
-// no draft status, post can be viewed by authorized user even Hidden is true
-type Post struct {
+// PostInfo is used for API response
+type PostInfo struct {
 	Id           int      `json:"id"`
 	Title        string   `json:"title"`
 	Tags         []string `json:"tags"`
@@ -36,10 +36,11 @@ type Post struct {
 
 type ManageData struct {
 	Status
-	Posts []Post `json:"posts"`
+	Posts []PostInfo `json:"posts"`
 }
 
-type Navi struct {
+// NaviInfo is used for API response
+type NaviInfo struct {
 	Id       int    `json:"id"`
 	Sequence int    `json:"sequence"`
 	Name     string `json:"name"`
@@ -48,7 +49,7 @@ type Navi struct {
 
 type NaviData struct {
 	Status
-	Navis []Navi `json:"navis"`
+	Navis []NaviInfo `json:"navis"`
 }
 
 type ManageModel struct {
