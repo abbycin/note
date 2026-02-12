@@ -133,7 +133,7 @@ function uploadImage() {
 
         showOk('Upload Ok');
 
-        $('#img').append(`<tr><td><a href="${res.link}">${res.link}</a></td><td>${res.name}</td><td><span class="btnDel glyphicon glyphicon-trash"></span></td></tr>`);
+        $('#img').append(`<tr><td><a href="${res.link}">${res.link}</a></td><td>${res.name}</td><td><button type="button" class="btn btn-default btn-xs btnDel">Remove</button></td></tr>`);
         editor.value(editor.value() + `![${res.name}](${res.link})`);
     }).catch(showError);
 }
@@ -185,11 +185,11 @@ $(document).ready(function() {
         let images = [];
         let jImages = JSON.parse(data.images);
         for(const [name, link] of Object.entries(jImages)) {
-            images.push(`<tr><td><a href="${link}">${link}</a></td><td>${name}</td><td><span class="btnDel glyphicon glyphicon-trash"></span></td></tr>`);
+            images.push(`<tr><td><a href="${link}">${link}</a></td><td>${name}</td><td><button type="button" class="btn btn-default btn-xs btnDel">Remove</button></td></tr>`);
         }
         $('#img').html(images.join(''));
 
-        // remove item when click trash icon
+        // Remove item when clicking the remove button
         $("#table").on('click', '.btnDel', function () {
             $(this).closest('tr').remove();
         });

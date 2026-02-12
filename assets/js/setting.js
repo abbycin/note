@@ -5,6 +5,8 @@ let User = "/api/user";
 let Logout = "/api/login";
 let hostname = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
 
+let deleteTarget = { element: null, id: null };
+
 function showOk(msg) {
     $('#myStatus').text('Status');
     $('#myModal').html(`<span style="color: green">${msg}</span>`);
@@ -126,17 +128,28 @@ function saveNavi(id) {
     });
 }
 
-function deleteNavi(o, id) {
+function confirmDelete(element, id) {
+    deleteTarget.element = element;
+    deleteTarget.id = id;
+    $('#deleteModal').modal('show');
+}
+
+function deleteNavi() {
+    let id = deleteTarget.id;
+    let element = deleteTarget.element;
+    
     fetch(`${Navi}?id=${id}`, {method: 'DELETE'}).then(function(j) {
         return j.json();
     }).then(function(res) {
         if(res.code !== 0) {
             throw res.error;
         }
-        var p=o.parentNode.parentNode;
+        var p = element.parentNode.parentNode;
         p.parentNode.removeChild(p);
+        $('#deleteModal').modal('hide');
     }).catch(function(e) {
         showErr(e);
+        $('#deleteModal').modal('hide');
     });
 }
 
@@ -155,6 +168,11 @@ function newNavi() {
 $(document).ready(function() {
     $('#modal').modal('hide');
     initNavi();
+    
+    // Bind confirm delete button
+    $('#confirmDelete').click(function() {
+        deleteNavi();
+    });
 });
 
 function initNavi() {
@@ -179,8 +197,8 @@ function buildTable(data) {
         let ptarget = `<td style="width: 35%"><input style="width: 100%" id="dst-${nav.id}" type="text" value="${nav.target}"></td>`;
         let pop =
             `<td style="width: 20%">
-                    <button class="btn btn-default glyphicon glyphicon-trash" onclick="deleteNavi(this,${nav.id});"></button>
-                    <button class="btn btn-default glyphicon glyphicon-floppy-save" onclick="saveNavi(${nav.id});"></button>
+                    <button class="btn btn-default btn-operation btn-danger" onclick="confirmDelete(this,${nav.id});">Delete</button>
+                    <button class="btn btn-default btn-operation btn-primary" onclick="saveNavi(${nav.id});">Save</button>
                 </td>`;
 
         $('#navis').append(`<tr>${pid}${pseq}${pname}${ptarget}${pop}</tr>`);
