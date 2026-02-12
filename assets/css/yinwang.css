@@ -248,22 +248,27 @@ a:hover {
 .post-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .post-item {
   background-color: var(--bg-card);
+  border: 1px solid rgb(var(--gray-200));
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   margin-bottom: var(--space-md);
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
-  border-left: 4px solid transparent;
 }
 
 .post-item:hover {
   box-shadow: var(--shadow-md);
-  border-left-color: rgb(var(--theme-500));
-  transform: translateX(4px);
+  border-color: rgb(var(--gray-300));
+  transform: translateY(-1px);
+}
+
+.post-item:last-child {
+  margin-bottom: 0;
 }
 
 .post-item a {

@@ -51,30 +51,28 @@
                         </div>
                     </details>
                 </div>
-                <div class="card">
-                    <ul class="post-list">
-                        {{range .Posts}}
-                            <li class="post-item">
-                                <a href="{{.Link}}">{{.Title}}</a>
-                                <div class="post-meta">
-                                    <span class="post-date">
-                                        <span class="post-date-only">{{.Date | formatDate}}</span>
-                                        <span class="post-time-only">{{.Date | formatClock}}</span>
-                                    </span>
-                                    {{if .Tags}}
-                                        <div class="post-tags-inline">
-                                            {{range .Tags}}
-                                                {{if .}}
-                                                    <a href="/tag/{{.}}" class="post-tag">{{.}}</a>
-                                                {{end}}
+                <ul class="post-list">
+                    {{range .Posts}}
+                        <li class="post-item">
+                            <a href="{{.Link}}">{{.Title}}</a>
+                            <div class="post-meta">
+                                <span class="post-date">
+                                    <span class="post-date-only">{{.Date | formatDate}}</span>
+                                    <span class="post-time-only">{{.Date | formatClock}}</span>
+                                </span>
+                                {{if .Tags}}
+                                    <div class="post-tags-inline">
+                                        {{range .Tags}}
+                                            {{if .}}
+                                                <a href="/tag/{{.}}" class="post-tag">{{.}}</a>
                                             {{end}}
-                                        </div>
-                                    {{end}}
-                                </div>
-                            </li>
-                        {{end}}
-                    </ul>
-                </div>
+                                        {{end}}
+                                    </div>
+                                {{end}}
+                            </div>
+                        </li>
+                    {{end}}
+                </ul>
 
                 <!-- Pagination -->
                 {{if gt .Pagination.TotalPages 1}}
