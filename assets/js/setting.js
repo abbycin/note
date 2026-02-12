@@ -136,7 +136,6 @@ function confirmDelete(element, id) {
 
 function deleteNavi() {
     let id = deleteTarget.id;
-    let element = deleteTarget.element;
     
     fetch(`${Navi}?id=${id}`, {method: 'DELETE'}).then(function(j) {
         return j.json();
@@ -144,8 +143,7 @@ function deleteNavi() {
         if(res.code !== 0) {
             throw res.error;
         }
-        var p = element.parentNode.parentNode;
-        p.parentNode.removeChild(p);
+        initNavi();
         $('#deleteModal').modal('hide');
     }).catch(function(e) {
         showErr(e);

@@ -41,18 +41,18 @@ function logOut() {
 }
 
 function toggleEye(id) {
-    let hide = $(`#eye-${id}`).hasClass("btn-hide");
-    fetch(`${Article}/${id}?hide=${!hide}`, {method: 'PUT'}).then(function(j) {
+    let isHidden = $(`#eye-${id}`).hasClass("btn-show");
+    fetch(`${Article}/${id}?hide=${!isHidden}`, {method: 'PUT'}).then(function(j) {
         return j.json();
     }).then(function(res) {
         if(res.code !== 0) {
             throw res.error;
         }
-        if(hide) {
-            $(`#eye-${id}`).removeClass("btn-hide").addClass("btn-show").text("Show");
+        if(isHidden) {
+            $(`#eye-${id}`).removeClass("btn-show").addClass("btn-hide").text("Hide");
         }
         else {
-            $(`#eye-${id}`).removeClass("btn-show").addClass("btn-hide").text("Hide");
+            $(`#eye-${id}`).removeClass("btn-hide").addClass("btn-show").text("Show");
         }
     }).catch(function(e) {
         alert(e);
@@ -67,7 +67,6 @@ function confirmDelete(element, id) {
 
 function deleteArticle() {
     let id = deleteTarget.id;
-    let element = deleteTarget.element;
     
     fetch(`${Article}/${id}`, {method: 'DELETE'}).then(function(j) {
         return j.json();
@@ -75,10 +74,16 @@ function deleteArticle() {
         if(res.code !== 0) {
             throw res.error;
         }
-        let p = element.parentNode.parentNode;
-        p.parentNode.removeChild(p);
+        allPosts = allPosts.filter(function(post) {
+            return post.id !== id;
+        });
+
+        let maxPage = Math.max(1, Math.ceil(allPosts.length / pageSize));
+        if(currentPage > maxPage) {
+            currentPage = maxPage;
+        }
+
         $('#deleteModal').modal('hide');
-        // Reload current page after delete
         loadPage(currentPage);
     }).catch(function(e) {
         alert(e);

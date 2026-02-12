@@ -117,7 +117,32 @@ func (d *GormDao) HideArticle(id int, hide bool) error {
 
 // GetPosts retrieves all posts (for backward compatibility)
 func (d *GormDao) GetPosts() (*model.ManageData, error) {
-	return d.GetPostsByPage(0, 0)
+	return d.GetAllPostsByPage(0, 0)
+}
+
+// GetAllPostsByPage retrieves posts including hidden ones
+func (d *GormDao) GetAllPostsByPage(page, pageSize int) (*model.ManageData, error) {
+	var posts []model.DBPost
+	query := d.db.Order("create_time desc")
+
+	if pageSize > 0 {
+		offset := page * pageSize
+		query = query.Offset(offset).Limit(pageSize)
+	}
+
+	result := query.Find(&posts)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	postInfos := make([]model.PostInfo, 0, len(posts))
+	for _, post := range posts {
+		postInfos = append(postInfos, dbPostToPostInfo(&post))
+	}
+
+	return &model.ManageData{
+		Posts: postInfos,
+	}, nil
 }
 
 // GetPostsByPage retrieves posts with pagination

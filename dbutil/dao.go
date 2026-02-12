@@ -237,7 +237,47 @@ func (d *Dao) HideArticle(id int, hide bool) error {
 }
 
 func (d *Dao) GetPosts() (*model.ManageData, error) {
-	return d.GetPostsByPage(0, 0)
+	return d.GetAllPostsByPage(0, 0)
+}
+
+// GetAllPostsByPage returns posts including hidden ones
+func (d *Dao) GetAllPostsByPage(page, pageSize int) (*model.ManageData, error) {
+	var rows *sql.Rows
+	var err error
+
+	if pageSize > 0 {
+		offset := page * pageSize
+		rows, err = d.db.Query(`select id, title, create_time, last_modified, tags, hide from posts order by create_time desc limit ? offset ?`, pageSize, offset)
+	} else {
+		rows, err = d.db.Query(`select id, title, create_time, last_modified, tags, hide from posts order by create_time desc`)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]model.PostInfo, 0)
+	for rows.Next() {
+		post := model.PostInfo{}
+		tags := ""
+		err = rows.Scan(&post.Id, &post.Title, &post.CreateTime, &post.LastModified, &tags, &post.Hidden)
+		if err != nil {
+			return nil, err
+		}
+		rawTags := strings.Split(tags, ",")
+		post.Tags = make([]string, 0, len(rawTags))
+		for _, tag := range rawTags {
+			tag = strings.TrimSpace(tag)
+			if tag != "" {
+				post.Tags = append(post.Tags, tag)
+			}
+		}
+		posts = append(posts, post)
+	}
+	res := &model.ManageData{
+		Posts: posts,
+	}
+	return res, nil
 }
 
 func (d *Dao) GetPostsByPage(page, pageSize int) (*model.ManageData, error) {
