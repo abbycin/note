@@ -248,7 +248,13 @@ a:hover {
 .post-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 900px;
 }
 
 .post-item {
@@ -256,9 +262,10 @@ a:hover {
   border: 1px solid rgb(var(--gray-200));
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
-  margin-bottom: var(--space-md);
+  margin: 0;
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .post-item:hover {
@@ -589,6 +596,15 @@ a:hover {
     font-size: 1.75rem;
   }
 
+  .post-list {
+    max-width: 100%;
+    gap: var(--space-sm);
+  }
+
+  .post-item {
+    padding: var(--space-md);
+  }
+
   .tags-mobile {
     display: block;
   }
@@ -801,6 +817,11 @@ a:hover {
 @media (max-width: 1024px) {
   .main-layout {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .main-content {
+    width: 100%;
   }
   
   .sidebar {
